@@ -16,7 +16,7 @@ class MyRobot(magicbot.MagicRobot):
     def createObjects(self):
         # NavX (purple board on top of the RoboRIO)
         self.navX = navx.AHRS.create_spi()
-        
+
         # Initialize SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
         
