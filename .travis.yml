@@ -1,13 +1,9 @@
 language: python
 python:
   - 3.6
+notifications:
+  email: false
 install:
   - "pip install -r tests/testing-requirements.txt"
 script:
-  - python3 tests/travis.py
-  - python3 robot/robot.py test
-
-  - num_errors=`find . -name \*.py -exec pep8 --ignore=E402 {} + | wc -l`
-  - echo $num_errors
-  - if [ "$num_errors" -gt 0 ]; then find . -name \*.py -exec pep8 --ignore=E402 {} +; exit 1; fi
-
+  - ./run_tests.sh
