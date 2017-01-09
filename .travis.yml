@@ -1,0 +1,9 @@
+language: python
+python:
+  - 3.6
+notifications:
+  email: false
+install:
+  - "pip install -r tests/testing-requirements.txt"
+script:
+  - ./run_tests.sh
