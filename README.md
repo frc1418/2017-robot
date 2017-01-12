@@ -1,4 +1,6 @@
-# 2017 Robot Code
+# 2017 Robot Code  
+[![Build Status](https://travis-ci.com/frc1418/2017-robot.svg?token=xpnQFTGBHababzyAzqKV&branch=master)](https://travis-ci.com/frc1418/2017-robot)
+
 **Robot Code** | [UI](https://github.com/frc1418/2017-UI) | [Image Processing](https://github.com/frc1418/2017-vision) 
 This code will be used to control FRC Team 1418's robot during the 2017 challenge, FIRST Steamworks.
 
