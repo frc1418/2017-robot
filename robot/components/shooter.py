@@ -1,8 +1,9 @@
 import wpilib
+import ctre
 from networktables.networktable import NetworkTable
 
 class Shooter:
-    shooter_motor = wpilib.CANTalon
+    shooter_motor = ctre.CANTalon
 
     def __init__(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
@@ -11,7 +12,7 @@ class Shooter:
 
     def on_enable(self):
         # Set control mode of motor to Velocity control so we can pass an RPM it should turn at
-        self.shooter_motor.changeControlMode(wpilib.CANTalon.ControlMode.Speed)
+        self.shooter_motor.changeControlMode(ctre.CANTalon.ControlMode.Speed)
 
     def execute(self):
         """Repeating code"""

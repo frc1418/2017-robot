@@ -2,6 +2,7 @@
 
 import magicbot
 import wpilib
+import ctre
 
 from robotpy_ext.control.button_debouncer import ButtonDebouncer
 from networktables.util import ntproperty
@@ -32,7 +33,7 @@ class MyRobot(magicbot.MagicRobot):
         # Motors
         # TODO: Drive Motors
 
-        self.shooter_motor = wpilib.CANTalon(5)
+        self.shooter_motor = ctre.CANTalon(5)
 
         # TODO: Drivetrain object
 
