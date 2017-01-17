@@ -2,6 +2,7 @@
 
 import magicbot
 import wpilib
+import ctre
 
 from robotpy_ext.control.button_debouncer import ButtonDebouncer
 from networktables.util import ntproperty
@@ -10,12 +11,15 @@ from robotpy_ext.common_drivers import navx
 
 from networktables.networktable import NetworkTable
 
+from components import shooter
+
 
 class MyRobot(magicbot.MagicRobot):
 
-    """Create basic components (motor controllers, joysticks, etc.)"""
+    shooter = shooter.Shooter
 
     def createObjects(self):
+        """Create basic components (motor controllers, joysticks, etc.)"""
         # NavX (purple board on top of the RoboRIO)
         self.navX = navx.AHRS.create_spi()
 
@@ -26,7 +30,10 @@ class MyRobot(magicbot.MagicRobot):
         self.joystick1 = wpilib.Joystick(0)
         self.joystick2 = wpilib.Joystick(1)
 
-        # TODO: Motors
+        # Motors
+        # TODO: Drive Motors
+
+        self.shooter_motor = ctre.CANTalon(5)
 
         # TODO: Drivetrain object
 
@@ -44,11 +51,11 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
-        pass
 
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
-        pass
+        # Temporary: Spin shooter motor based on joystick1's Y.
+        self.shooter.rpm = self.joystick1.getY() * 1024
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)

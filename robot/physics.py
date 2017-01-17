@@ -3,6 +3,7 @@ import math
 from networktables.util import ntproperty
 from pyfrc.physics.drivetrains import four_motor_drivetrain
 import wpilib
+import ctre
 
 
 class PhysicsEngine:
