@@ -7,6 +7,24 @@
 			"starting_y": 25,
 			"starting_angle": 180
 		},
+		"analog": {
+			"1": "Rear Right Rotation Encoder",
+			"2": "Rear Left Rotation Encoder",
+			"3": "Front Right Rotation Encoder",
+			"4": "Front Left Rotation Encoder"
+		},
+		"pwm": {
+			"1": "Rear Right Rotation Motor",
+			"2": "Rear Left Rotation Motor",
+			"3": "Front Right Rotation Motor",
+			"4": "Front Left Rotation Motor"
+		},
+		"CAN": {
+			"10": "Rear Right Drive Motor",
+			"15": "Rear Left Drive Motor",
+			"20": "Front Right Drive Motor",
+			"25": "Front Left Drive Motor"
+		},
 		"field": {
 			"w": 27,
 			"h": 27,
