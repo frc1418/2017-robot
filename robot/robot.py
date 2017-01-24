@@ -11,17 +11,18 @@ from robotpy_ext.common_drivers import navx
 
 from networktables.networktable import NetworkTable
 
-from components import shooter
+from components import shooter, swervemodule, swervedrive
 
 
 class MyRobot(magicbot.MagicRobot):
 
     shooter = shooter.Shooter
+    drive = swervedrive.SwerveDrive
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
         # NavX (purple board on top of the RoboRIO)
-        self.navX = navx.AHRS.create_spi()
+        self.navx = navx.AHRS.create_spi()
 
         # Initialize SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
@@ -31,7 +32,10 @@ class MyRobot(magicbot.MagicRobot):
         self.joystick2 = wpilib.Joystick(1)
 
         # Motors
-        # TODO: Drive Motors
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(1),wpilib.AnalogInput(1), SDPrefix="rr_module", zero=0.0, inverted=True)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(15), wpilib.VictorSP(2),wpilib.AnalogInput(2), SDPrefix="rl_odule", zero=0.0)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(3),wpilib.AnalogInput(3), SDPrefix="fr_module", zero=0.0, inverted=True)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(25), wpilib.VictorSP(4),wpilib.AnalogInput(4), SDPrefix="fl_module", zero=0.0)
 
         self.shooter_motor = ctre.CANTalon(5)
 
@@ -54,6 +58,9 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
+        
+        self.drive.move(self.joystick1.getY()*-1, self.joystick1.getX()*-1, self.joystick2.getX()*-1)
+        
         # Temporary: Spin shooter motor based on joystick1's Y.
         self.shooter.rpm = self.joystick1.getY() * 1024
 
