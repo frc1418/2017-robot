@@ -66,11 +66,11 @@ class SwerveDrive:
         self.length = 1
         
     @property
-    def chasis_dimension(self):
+    def chassis_dimension(self):
         return (self.width, self.length)
     
-    @chasis_dimension.setter
-    def chasis_dimension(self, dimension):
+    @chassis_dimension.setter
+    def chassis_dimension(self, dimension):
         self.width = dimension[0]
         self.length = dimension[1]
 
