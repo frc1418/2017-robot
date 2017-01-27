@@ -10,8 +10,6 @@ MAX_TICK = 4096
 MAX_DEG = 360
 
 class SwerveModule:
-
-    debugging = ntproperty('/drive/drive/debugging', False)
     
     def __init__(self, *args, **kwargs):
         '''
@@ -58,7 +56,7 @@ class SwerveModule:
 
         #State variables
         self.allow_reverse = kwargs.pop("allow_reverse", True)
-        self.snap_rotation_axies = self.sd.getAutoUpdateValue('/drive/%s/debugging' % self.sd_prefix, False);
+        self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False);
 
     def get_voltage(self):
         return self.encoder.getVoltage() - self.encoder_zero
@@ -160,7 +158,7 @@ class SwerveModule:
         
         self.sd.putNumber("drive/%s/degrees" % self.sd_prefix, self.voltage_to_degrees(self.get_voltage()))
         
-        if self.debugging:
+        if self.debugging.value:
             self.sd.putNumber("drive/%s/requested_voltage" % self.sd_prefix, self._requested_voltage)
             self.sd.putNumber("drive/%s/requested_speed" % self.sd_prefix, self._requested_speed)
             self.sd.putNumber("drive/%s/raw voltage" % self.sd_prefix, self.encoder.getVoltage()) #DO NOT USE self.get_voltage() here
