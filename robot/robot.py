@@ -33,7 +33,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(1),wpilib.AnalogInput(1), SDPrefix="rr_module", zero=0.0, inverted=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(15), wpilib.VictorSP(2),wpilib.AnalogInput(2), SDPrefix="rl_odule", zero=0.0)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(15), wpilib.VictorSP(2),wpilib.AnalogInput(2), SDPrefix="rl_module", zero=0.0)
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(3),wpilib.AnalogInput(3), SDPrefix="fr_module", zero=0.0, inverted=True)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(25), wpilib.VictorSP(4),wpilib.AnalogInput(4), SDPrefix="fl_module", zero=0.0)
 
