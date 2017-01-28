@@ -11,25 +11,30 @@ from robotpy_ext.common_drivers import navx
 
 from networktables.networktable import NetworkTable
 
-from components import shooter, swervemodule, swervedrive
+from components import shooter, gearpicker, swervemodule, swervedrive
 
 
 class MyRobot(magicbot.MagicRobot):
 
-    shooter = shooter.Shooter
     drive = swervedrive.SwerveDrive
+    shooter = shooter.Shooter
+    gear_picker = gearpicker.GearPicker
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
-        # NavX (purple board on top of the RoboRIO)
+        # NavX
         self.navx = navx.AHRS.create_spi()
 
         # Initialize SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
 
-        # Joysticks
+        # Joysticks (1 = left, 2 = right)
         self.joystick1 = wpilib.Joystick(0)
         self.joystick2 = wpilib.Joystick(1)
+
+        # Triggers
+        self.left_trigger = ButtonDebouncer(self.joystick1, 1)
+        self.right_trigger = ButtonDebouncer(self.joystick2, 1)
 
         # Motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(1),wpilib.AnalogInput(1), SDPrefix="rr_module", zero=0.0, inverted=True)
@@ -39,15 +44,25 @@ class MyRobot(magicbot.MagicRobot):
 
         self.shooter_motor = ctre.CANTalon(5)
 
-        # TODO: Drivetrain object
+        # Pistons for gear picker
+        self.picker = wpilib.DoubleSolenoid(0, 1)
+        self.pivot = wpilib.DoubleSolenoid(2, 3)
+
+        self.pivot_down_button = ButtonDebouncer(self.joystick2, 2)
+        self.pivot_up_button = ButtonDebouncer(self.joystick2, 3)
+
 
     def autonomous(self):
-        """Prepare for autonomous mode"""
+        """Prepare for autonomous mode."""
         pass
 
     def disabledPeriodic(self):
-        """Repeat periodically while robot is disabled. Usually emptied.
-        Sometimes used to easily test sensors and other things."""
+        """
+        Repeat periodically while robot is disabled.
+
+        Usually emptied.
+        Sometimes used to easily test sensors and other things.
+        """
         pass
 
     def disabledInit(self):
@@ -55,14 +70,19 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
+        pass
 
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
-        
         self.drive.move(self.joystick1.getY()*-1, self.joystick1.getX()*-1, self.joystick2.getX()*-1)
-        
-        # Temporary: Spin shooter motor based on joystick1's Y.
-        self.shooter.rpm = self.joystick1.getY() * 1024
+
+        if self.pivot_up_button.get():
+            self.gear_picker.pivot_up()
+        elif self.pivot_down_button.get():
+            self.gear_picker.pivot_down()
+
+        if self.right_trigger.get():
+            self.gear_picture.actuate_picker()
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)
