@@ -11,7 +11,7 @@ from robotpy_ext.common_drivers import navx
 
 from networktables.networktable import NetworkTable
 
-from components import shooter, gearpicker, swervemodule, swervedrive
+from components import shooter, gearpicker, swervemodule, swervedrive, climber
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -19,6 +19,7 @@ class MyRobot(magicbot.MagicRobot):
     drive = swervedrive.SwerveDrive
     shooter = shooter.Shooter
     gear_picker = gearpicker.GearPicker
+    climber = climber.Climber
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
@@ -37,19 +38,29 @@ class MyRobot(magicbot.MagicRobot):
         self.right_trigger = ButtonDebouncer(self.joystick2, 1)
 
         # Motors
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(1),wpilib.AnalogInput(1), SDPrefix="rr_module", zero=0.0, inverted=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(15), wpilib.VictorSP(2),wpilib.AnalogInput(2), SDPrefix="rl_module", zero=0.0)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(3),wpilib.AnalogInput(3), SDPrefix="fr_module", zero=0.0, inverted=True)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(25), wpilib.VictorSP(4),wpilib.AnalogInput(4), SDPrefix="fl_module", zero=0.0)
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix="rr_module", zero=1.55)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix="rl_module", zero=3.03)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix="fr_module", zero=3.73)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix="fl_module", zero=1.60)
 
-        self.shooter_motor = ctre.CANTalon(5)
+        self.shooter_motor = ctre.CANTalon(25)
 
         # Pistons for gear picker
-        self.picker = wpilib.DoubleSolenoid(0, 1)
-        self.pivot = wpilib.DoubleSolenoid(2, 3)
+        self.picker = wpilib.DoubleSolenoid(6, 7)
+        self.pivot = wpilib.DoubleSolenoid(4, 5)
 
         self.pivot_down_button = ButtonDebouncer(self.joystick2, 2)
         self.pivot_up_button = ButtonDebouncer(self.joystick2, 3)
+        
+        #Climb motors
+        self.climb_motor1 = wpilib.spark.Spark(4)
+        self.climb_motor2 = wpilib.spark.Spark(5)
+        
+        # Drive control
+        self.field_centric_button = ButtonDebouncer(self.joystick1, 6)
+        
+        
+        self.pdp = wpilib.PowerDistributionPanel(0)
 
 
     def autonomous(self):
@@ -63,7 +74,12 @@ class MyRobot(magicbot.MagicRobot):
         Usually emptied.
         Sometimes used to easily test sensors and other things.
         """
-        pass
+        self.rr_module.update_smartdash()
+        self.rl_module.update_smartdash()
+        self.fr_module.update_smartdash()
+        self.fl_module.update_smartdash()
+        self.update_sd()
+        
 
     def disabledInit(self):
         """Do once right away when robot is disabled."""
@@ -82,7 +98,19 @@ class MyRobot(magicbot.MagicRobot):
             self.gear_picker.pivot_down()
 
         if self.right_trigger.get():
-            self.gear_picture.actuate_picker()
+            self.gear_picker.actuate_picker()
+            
+        if self.joystick1.getRawButton(1):
+            self.climber.climb()
+            
+        if self.field_centric_button.get():
+            self.drive.field_centric = not self.drive.field_centric
+            
+        self.update_sd()
+            
+    def update_sd(self):
+        self.sd.putNumber("/climber/motor1_current_draw", self.pdp.getCurrent(1))
+        self.sd.putNumber("/climber/motor2_current_draw", self.pdp.getCurrent(2))
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)

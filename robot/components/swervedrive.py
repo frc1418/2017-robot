@@ -62,8 +62,8 @@ class SwerveDrive:
         self.squared_inputs = True
         self.snap_rotation = False
         
-        self.width = 1
-        self.length = 1
+        self.width = 22
+        self.length = 18.5
         
     @property
     def chassis_dimension(self):
@@ -95,6 +95,9 @@ class SwerveDrive:
             self._field_centric = False
         else:
             self._field_centric = value
+            
+            if value:
+                self.navx.reset()
         
     @staticmethod
     def square_input(input):
@@ -164,7 +167,7 @@ class SwerveDrive:
             theta = math.radians(360-self.navx.yaw)
             
             fwdX = fwd * math.cos(theta)
-            fwdY = (-fwd) * math.sin(theta) #TODO: verify and understand why fwd is neg
+            fwdY = (-fwd) * math.sin(theta) # TODO: verify and understand why fwd is neg
             strafeX = strafe * math.cos(theta)
             strafeY = strafe * math.sin(theta)
             
@@ -183,26 +186,26 @@ class SwerveDrive:
         
         #Does nothing if the values are lower than the input thresh
         if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
-           self._requested_vectors['fwd'] = 0;
+           self._requested_vectors['fwd'] = 0
         
         if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
-            self._requested_vectors['strafe'] = 0;
+            self._requested_vectors['strafe'] = 0
         
         if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
-            self._requested_vectors['rcw'] = 0;
-            
-        if self._requested_vectors['rcw'] != 0 and self._requested_vectors['strafe'] != 0 and self._requested_vectors['fwd'] != 0: #Prevents a useless loop.
-            self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
+            self._requested_vectors['rcw'] = 0
+                
+        if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
+            self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
             return
 
         ratio = math.sqrt((self.length ** 2)+(self.width ** 2))
-        #Velocities per quadrant
+        # Velocities per quadrant
         leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
         rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
         frontX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
         rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
 
-        #Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
+        # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         fr_speed = math.sqrt((rightY ** 2) + (frontX ** 2))
         fr_angle = math.degrees(math.atan2(frontX, rightY))
 
@@ -215,7 +218,7 @@ class SwerveDrive:
         rr_speed = math.sqrt((rightY ** 2) + (rearX ** 2))
         rr_angle = math.degrees(math.atan2(rearX, rightY))
 
-        #Assigns the speeds and angles in dictionaries
+        # Assigns the speeds and angles in dictionaries
         self._requested_speeds['front_right'] = fr_speed
         self._requested_speeds['front_left'] = fl_speed
         self._requested_speeds['rear_right'] = rr_speed
@@ -258,4 +261,7 @@ class SwerveDrive:
             for key in self._requested_angles:
                 self.sd.putNumber("drive/drive/%s angle" % key, self._requested_angles[key])
                 self.sd.putNumber("drive/drive/%s speed" % key, self._requested_speeds[key])
+                
+        for key in self.modules:
+            self.modules[key].update_smartdash()
                 
