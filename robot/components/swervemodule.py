@@ -31,11 +31,11 @@ class SwerveModule:
             
         '''
 
-        #SmartDashboard
+        # SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
         self.sd_prefix = kwargs.pop("SDPrefix", False)
 
-        #Motors
+        # Motors
         self.driveMotor = args[0]
         self.driveMotor.setInverted(kwargs.pop("inverted", False))
         
@@ -44,17 +44,17 @@ class SwerveModule:
         self._requested_voltage = 0 #Angle in voltage form
         self._requested_speed = 0
         
-        #Encoder
+        # Encoder
         self.encoder = args[2]
         self.encoder_zero = kwargs.pop("zero", 0.0)
 
-        #PID
+        # PID
         self._pid_controller = wpilib.PIDController(1.2, 0.0, 0.0, self.encoder, self.rotateMotor)
         self._pid_controller.setContinuous()
         self._pid_controller.setInputRange(0.0, 5.0)
         self._pid_controller.enable()
 
-        #State variables
+        # State variables
         self.allow_reverse = kwargs.pop("allow_reverse", True)
         self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False);
 
@@ -127,6 +127,8 @@ class SwerveModule:
         Sets the requested speed and rotation of passed
         '''
         
+        
+        
         deg = deg % 360 #Prevents values past 360
         
         if self.allow_reverse:
@@ -135,7 +137,7 @@ class SwerveModule:
                 deg += 180
                 
                 deg = deg % 360 
-
+                
         self._requested_speed = speed
         self._set_deg(deg)
 
@@ -161,7 +163,7 @@ class SwerveModule:
         if self.debugging.value:
             self.sd.putNumber("drive/%s/requested_voltage" % self.sd_prefix, self._requested_voltage)
             self.sd.putNumber("drive/%s/requested_speed" % self.sd_prefix, self._requested_speed)
-            self.sd.putNumber("drive/%s/raw voltage" % self.sd_prefix, self.encoder.getVoltage()) #DO NOT USE self.get_voltage() here
+            self.sd.putNumber("drive/%s/raw voltage" % self.sd_prefix, self.encoder.getVoltage()) # DO NOT USE self.get_voltage() here
             self.sd.putNumber("drive/%s/encoder_zero" % self.sd_prefix, self.encoder_zero)
     
             self.sd.putNumber("drive/%s/PID" % self.sd_prefix, self._pid_controller.get())
