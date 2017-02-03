@@ -11,7 +11,7 @@ from robotpy_ext.common_drivers import navx
 
 from networktables.networktable import NetworkTable
 
-from components import shooter, gearpicker, swervemodule, swervedrive, climber
+from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -20,6 +20,7 @@ class MyRobot(magicbot.MagicRobot):
     shooter = shooter.Shooter
     gear_picker = gearpicker.GearPicker
     climber = climber.Climber
+    gimbal = gimbal.Gimbal
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
@@ -51,15 +52,17 @@ class MyRobot(magicbot.MagicRobot):
 
         self.pivot_down_button = ButtonDebouncer(self.joystick2, 2)
         self.pivot_up_button = ButtonDebouncer(self.joystick2, 3)
-        
-        #Climb motors
+
+        # Climb motors
         self.climb_motor1 = wpilib.spark.Spark(4)
         self.climb_motor2 = wpilib.spark.Spark(5)
-        
+
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.joystick1, 6)
-        
-        
+
+        self.gimbal_yaw = wpilib.Servo(6)
+        self.gimbal_pitch = wpilib.Servo(7)
+
         self.pdp = wpilib.PowerDistributionPanel(0)
 
 
@@ -79,7 +82,7 @@ class MyRobot(magicbot.MagicRobot):
         self.fr_module.update_smartdash()
         self.fl_module.update_smartdash()
         self.update_sd()
-        
+
 
     def disabledInit(self):
         """Do once right away when robot is disabled."""
@@ -99,15 +102,15 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.right_trigger.get():
             self.gear_picker.actuate_picker()
-            
+
         if self.joystick1.getRawButton(1):
             self.climber.climb()
-            
+
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
-            
+
         self.update_sd()
-            
+
     def update_sd(self):
         self.sd.putNumber("/climber/motor1_current_draw", self.pdp.getCurrent(1))
         self.sd.putNumber("/climber/motor2_current_draw", self.pdp.getCurrent(2))
