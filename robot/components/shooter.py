@@ -1,26 +1,25 @@
+from magicbot import StateMachine, timed_state, state
 import wpilib
 import ctre
-from networktables.networktable import NetworkTable
 
-class Shooter:
+class Shooter(StateMachine):
+    belt_motor = wpilib.spark.Spark
     shooter_motor = ctre.CANTalon
 
-    def __init__(self):
-        self.sd = NetworkTable.getTable('SmartDashboard')
+    def stop(self):
+        self.shooter_motor.set(0)
+        self.belt_motor.set(0)
 
-        self.rpm = 0
+        self.done()
 
-    def on_enable(self):
-        # Set control mode of motor to Velocity control so we can pass an RPM it should turn at
-        self.shooter_motor.changeControlMode(ctre.CANTalon.ControlMode.Speed)
+    def shoot(self):
+        self.engage()
 
-    def execute(self):
-        """Repeating code"""
-        # Set the motor to the currently-desired RPM
-        self.shooter_motor.set(self.rpm)
-        # Set requested RPM back to zero. This way the robot will stop if it crashes.
-        self.rpm = 0
+    @timed_state(duration=2.0, first=True, next_state='feed_shoot')
+    def spinup(self):
+        self.shooter_motor.set(-1)
 
-    def update_sd(self, name):
-        """Puts refreshed values to SmartDashboard"""
-        pass
+    @state
+    def feed_shoot(self):
+        self.shooter_motor.set(-1)
+        self.belt_motor.set(1)
