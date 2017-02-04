@@ -17,11 +17,11 @@ class Gimbal:
     def on_enable(self):
         pass
 
-    def update_sd(self, name):
-        """Put refreshed values to SmartDashboard."""
-        pass
-
     def execute(self):
         """Repeating code."""
         self.gimbal_yaw.set(self.yaw)
         self.gimbal_pitch.set(self.pitch)
+
+    def update_sd(self, name):
+        """Put refreshed values to SmartDashboard."""
+        pass
