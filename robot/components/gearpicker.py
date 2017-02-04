@@ -7,11 +7,15 @@ class GearPicker:
     # The piston that actuates the picker up and down
     pivot = wpilib.DoubleSolenoid
 
+    intake_motor = wpilib.VictorSP
+
     def setup(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
 
         self._picker_state = self.picker.get()
         self._pivot_state = self.pivot.get()
+
+        self.intake_on = False
 
     def on_enable(self):
         pass
@@ -26,10 +30,13 @@ class GearPicker:
     def pivot_up(self):
         """Pivot picker arm up."""
         self._pivot_state = 1
+        if self.intake_on:
+            self.intake_motor.set(1)
 
     def pivot_down(self):
         """Pivot picker arm down."""
         self._pivot_state = 2
+        self.intake_motor.set(0)
 
     def update_sd(self, name):
         """Put refreshed values to SmartDashboard."""
