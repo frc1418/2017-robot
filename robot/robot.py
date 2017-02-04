@@ -43,7 +43,11 @@ class MyRobot(magicbot.MagicRobot):
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix="fr_module", zero=3.73)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix="fl_module", zero=1.60)
 
-        self.shooter_motor = ctre.CANTalon(25)
+        # Shooting motors
+        self.shooter_motor = ctre.CANTalon(15)
+        self.belt_motor = wpilib.spark.Spark(9)
+        
+        self.intake_motor = wpilib.VictorSP(8)
 
         # Pistons for gear picker
         self.picker = wpilib.DoubleSolenoid(6, 7)
@@ -100,11 +104,17 @@ class MyRobot(magicbot.MagicRobot):
         if self.right_trigger.get():
             self.gear_picker.actuate_picker()
             
-        if self.joystick1.getRawButton(1):
+        if self.joystick1.getRawButton(3):
             self.climber.climb()
+        
+        if self.joystick1.getRawButton(1):
+            self.shooter.shoot()
+        else:
+            self.shooter.stop()
             
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
+            
             
         self.update_sd()
             
