@@ -6,6 +6,8 @@ class GearPicker:
     picker = wpilib.DoubleSolenoid
     # The piston that actuates the picker up and down
     pivot = wpilib.DoubleSolenoid
+    
+    intake_motor = wpilib.VictorSP
 
     intake_motor = wpilib.VictorSP
 

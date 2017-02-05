@@ -47,7 +47,7 @@ class MyRobot(magicbot.MagicRobot):
         # Shooting motors
         self.shooter_motor = ctre.CANTalon(15)
         self.belt_motor = wpilib.spark.Spark(9)
-
+        
         self.intake_motor = wpilib.VictorSP(8)
 
         # Pistons for gear picker
@@ -108,21 +108,20 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.right_trigger.get():
             self.gear_picker.actuate_picker()
-
+            
         if self.joystick1.getRawButton(3):
             self.climber.climb()
-
+            
         if self.joystick1.getRawButton(1):
             self.shooter.shoot()
         else:
             self.shooter.stop()
-
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
 
         if self.accumulator_button.get():
             self.gear_picker.intake_on = not self.gear_picker.intake_on
-
+            
         self.update_sd()
 
     def update_sd(self):
