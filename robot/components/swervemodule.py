@@ -49,7 +49,7 @@ class SwerveModule:
         self.encoder_zero = kwargs.pop("zero", 0.0)
 
         # PID
-        self._pid_controller = wpilib.PIDController(1.2, 0.0, 0.0, self.encoder, self.rotateMotor)
+        self._pid_controller = wpilib.PIDController(1.5, 0.0, 0.0, self.encoder, self.rotateMotor)
         self._pid_controller.setContinuous()
         self._pid_controller.setInputRange(0.0, 5.0)
         self._pid_controller.enable()
