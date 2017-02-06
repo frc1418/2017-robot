@@ -1,5 +1,6 @@
 import wpilib
 from networktables.networktable import NetworkTable
+from components import gimbal
 
 class GearPicker:
     # The piston that actuates to grab the gear
@@ -8,6 +9,9 @@ class GearPicker:
     pivot = wpilib.DoubleSolenoid
     
     intake_motor = wpilib.VictorSP
+    gimbal = gimbal.Gimbal
+
+    
 
     intake_motor = wpilib.VictorSP
 
@@ -32,12 +36,20 @@ class GearPicker:
     def pivot_up(self):
         """Pivot picker arm up."""
         self._pivot_state = 1
+        
+        self.gimbal.yaw = 0.0
+        self.gimbal.pitch = 0.4
+        
         if self.intake_on:
             self.intake_motor.set(1)
 
     def pivot_down(self):
         """Pivot picker arm down."""
         self._pivot_state = 2
+        
+        self.gimbal.yaw = 0.15
+        self.gimbal.pitch = 0.7
+        
         self.intake_motor.set(0)
 
     def update_sd(self, name):

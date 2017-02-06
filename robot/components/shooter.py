@@ -15,7 +15,7 @@ class Shooter(StateMachine):
     def shoot(self):
         self.engage()
     
-    @timed_state(duration=2.0, first=True, next_state='feed_shoot')
+    @timed_state(duration=1.0, first=True, next_state='feed_shoot')
     def spinup(self):
         self.shooter_motor.set(-1)
     
