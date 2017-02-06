@@ -30,13 +30,14 @@ class MyRobot(magicbot.MagicRobot):
         # Initialize SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
 
-        # Joysticks (1 = left, 2 = right)
-        self.joystick1 = wpilib.Joystick(0)
-        self.joystick2 = wpilib.Joystick(1)
+        # Joysticks
+        self.left_joystick = wpilib.Joystick(0)
+        self.right_joystick = wpilib.Joystick(1)
+        self.secondary_joystick = wpilib.Joystick(2)
 
-        # Triggers
-        self.left_trigger = ButtonDebouncer(self.joystick1, 1)
-        self.right_trigger = ButtonDebouncer(self.joystick2, 1)
+        # Triggers and buttons
+        self.right_trigger = ButtonDebouncer(self.right_joystick, 1)
+        self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93)
@@ -47,24 +48,28 @@ class MyRobot(magicbot.MagicRobot):
         # Shooting motors
         self.shooter_motor = ctre.CANTalon(15)
         self.belt_motor = wpilib.spark.Spark(9)
-        
+
         self.intake_motor = wpilib.VictorSP(8)
 
         # Pistons for gear picker
         self.picker = wpilib.DoubleSolenoid(6, 7)
         self.pivot = wpilib.DoubleSolenoid(4, 5)
 
-        self.pivot_down_button = ButtonDebouncer(self.joystick2, 2)
-        self.pivot_up_button = ButtonDebouncer(self.joystick2, 3)
+        # Toggling button on secondary joystick
+        self.pivot_toggle_button = ButtonDebouncer(self.secondary_joystick, 3)
 
-        self.accumulator_button = ButtonDebouncer(self.joystick1, 10)
+        # Or, up and down buttons on right joystick
+        self.pivot_down_button = ButtonDebouncer(self.right_joystick, 2)
+        self.pivot_up_button = ButtonDebouncer(self.right_joystick, 3)
+
+        self.accumulator_button = ButtonDebouncer(self.secondary_joystick, 4)
 
         # Climb motors
         self.climb_motor1 = wpilib.spark.Spark(4)
         self.climb_motor2 = wpilib.spark.Spark(5)
 
         # Drive control
-        self.field_centric_button = ButtonDebouncer(self.joystick1, 6)
+        self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
 
         self.gimbal_yaw = wpilib.Servo(6)
         self.gimbal_pitch = wpilib.Servo(7)
@@ -99,20 +104,28 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
-        self.drive.move(self.joystick1.getY()*-1, self.joystick1.getX()*-1, self.joystick2.getX()*-1)
+        self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
 
+        # Pivot toggling button on secondary joystick
+        if self.pivot_toggle_button.get():
+            if self.gear_picker._pivot_state == 1:
+                self.gear_picker.pivot_down()
+            else:
+                self.gear_picker.pivot_up()
+
+        # Or, up/down buttons on right joystick for primary driver control.
         if self.pivot_up_button.get():
             self.gear_picker.pivot_up()
         elif self.pivot_down_button.get():
             self.gear_picker.pivot_down()
 
-        if self.right_trigger.get():
+        if self.right_trigger.get() or self.secondary_trigger.get():
             self.gear_picker.actuate_picker()
-            
-        if self.joystick1.getRawButton(3):
+
+        if self.left_joystick.getRawButton(3):
             self.climber.climb()
-            
-        if self.joystick1.getRawButton(1):
+
+        if self.left_joystick.getRawButton(1):
             self.shooter.shoot()
         else:
             self.shooter.stop()
@@ -121,7 +134,7 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.accumulator_button.get():
             self.gear_picker.intake_on = not self.gear_picker.intake_on
-            
+
         self.update_sd()
 
     def update_sd(self):
