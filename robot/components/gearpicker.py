@@ -13,6 +13,8 @@ class GearPicker:
 
     
 
+    intake_motor = wpilib.VictorSP
+
     def setup(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
 
@@ -37,8 +39,6 @@ class GearPicker:
         
         self.gimbal.yaw = 0.0
         self.gimbal.pitch = 0.4
-        #self.sd.putNumber('/camera/gimbal/yaw', 0.0)
-        #self.sd.putNumber('/camera/gimbal/pitch', 0.4)
         
         if self.intake_on:
             self.intake_motor.set(1)
@@ -49,8 +49,6 @@ class GearPicker:
         
         self.gimbal.yaw = 0.15
         self.gimbal.pitch = 0.7
-        #self.sd.putNumber('/camera/gimbal/yaw', 0.15)
-        #self.sd.putNumber('/camera/gimbal/pitch', 0.7)
         
         self.intake_motor.set(0)
 
