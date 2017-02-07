@@ -122,10 +122,10 @@ class MyRobot(magicbot.MagicRobot):
         if self.right_trigger.get() or self.secondary_trigger.get():
             self.gear_picker.actuate_picker()
 
-        if self.left_joystick.getRawButton(3):
+        if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
             self.climber.climb()
 
-        if self.left_joystick.getRawButton(1):
+        if self.left_joystick.getRawButton(1) or self.secondary_joystick.getRawButton(2):
             self.shooter.shoot()
         else:
             self.shooter.stop()
@@ -134,6 +134,13 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.accumulator_button.get():
             self.gear_picker.intake_on = not self.gear_picker.intake_on
+            
+        if self.left_joystick.getRawButton(2):
+            self.drive.xy_multiplier = 0.5
+            self.drive.rotation_multiplier = 0.25
+        else:
+            self.drive.xy_multiplier = 1.0
+            self.drive.rotation_multiplier = 0.75
 
         self.update_sd()
 
