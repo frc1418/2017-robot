@@ -58,7 +58,7 @@ class SwerveDrive:
         }
         
         self.field_centric = False
-        self.allow_reverse = True
+        self.allow_reverse = False
         self.squared_inputs = True
         self.snap_rotation = False
         
