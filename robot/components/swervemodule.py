@@ -9,6 +9,10 @@ MAX_VOLTAGE = 5
 MAX_TICK = 4096
 MAX_DEG = 360
 
+WHEEL_DIAMETER = 4/12 # 4 Inches
+WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * math.pi
+WHEEL_TICKS_PER_REV = 55000
+
 class SwerveModule:
     
     def __init__(self, *args, **kwargs):
@@ -57,9 +61,31 @@ class SwerveModule:
         # State variables
         self.allow_reverse = kwargs.pop("allow_reverse", True)
         self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False);
+        
+        self.has_drive_encoder = kwargs.pop("has_drive_encoder", False)
+        self.wait_for_align = kwargs.pop("wait_for_align", False)
+        self.drive_encoder_zero = 0
 
     def get_voltage(self):
         return self.encoder.getVoltage() - self.encoder_zero
+    
+    def get_drive_encoder_tick(self):
+        if not self.has_drive_encoder:
+            return False
+        
+        return self.driveMotor.getPosition() - self.drive_encoder_zero
+    
+    def get_drive_encoder_distance(self):
+        if not self.has_drive_encoder:
+            return False
+        
+        return ((self.driveMotor.getPosition() - self.drive_encoder_zero) * WHEEL_CIRCUMFERENCE) / WHEEL_TICKS_PER_REV
+    
+    def zero_drive_encoder(self):
+        if not self.has_drive_encoder:
+            return False
+        
+        self.drive_encoder_zero = self.driveMotor.getPosition()
     
     @staticmethod
     def voltage_to_degrees(voltage):
@@ -76,6 +102,17 @@ class SwerveModule:
             deg = 360+deg;
 
         return deg
+
+    @staticmethod
+    def voltage_to_rad(voltage):
+        '''
+        Converts a given voltage value to rad
+
+        :param voltage: a voltage value between 0 and 5
+        '''
+
+        rad = (voltage/5)*2*math.pi
+        return rad
 
     @staticmethod
     def voltage_to_tick(voltage):
@@ -150,7 +187,11 @@ class SwerveModule:
         '''
         
         self._pid_controller.setSetpoint(self._requested_voltage)
-        self.driveMotor.set(self._requested_speed)
+        
+        #print(self._requested_speed)
+        if abs(self._pid_controller.get()) < 0.1 or not self.wait_for_align:
+            self.driveMotor.set(self._requested_speed)
+            
         self.update_smartdash()
 
     def update_smartdash(self):
@@ -167,5 +208,9 @@ class SwerveModule:
             self.sd.putNumber("drive/%s/encoder_zero" % self.sd_prefix, self.encoder_zero)
     
             self.sd.putNumber("drive/%s/PID" % self.sd_prefix, self._pid_controller.get())
+            ##self.sd.putNumber("drive/%s/PID Error" % self.sd_prefix, self._pid_controller.getError())
+            
+            if self.has_drive_encoder:
+                self.sd.putNumber("drive/%s/raw drive position" % self.sd_prefix, self.driveMotor.getPosition())
             
             self.sd.putBoolean("drive/%s/allow_reverse" % self.sd_prefix, self.allow_reverse)

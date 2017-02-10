@@ -52,11 +52,18 @@ class GearPicker:
         
         self.intake_motor.set(0)
 
-    def update_sd(self, name):
+    def update_sd(self):
         """Put refreshed values to SmartDashboard."""
-        pass
+        self.sd.putBoolean("picker/intake_on", self.intake_on)
+        self.sd.putBoolean('picker/pivot_state', self.pivot.get() == 1)
 
     def execute(self):
         """Repeating code."""
+        self.update_sd()
         self.picker.set(self._picker_state)
         self.pivot.set(self._pivot_state)
+        
+        if self._pivot_state == 1 and self.intake_on:
+            self.intake_motor.set(1)
+        else:
+            self.intake_motor.set(0)

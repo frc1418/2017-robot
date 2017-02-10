@@ -21,6 +21,8 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 1)
     
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)    
+    
+    # = ntproperty('/SmartDashboard/drive/drive/debugging', False)  
         
     def setup(self):
         '''
@@ -57,13 +59,23 @@ class SwerveDrive:
                 'rear_right': 0
         }
         
+        self._predicted_position = {
+                'fwd': 0,
+                'strafe': 0,
+                'rcw': 0
+        }
+        
+        self.predict_position = False
+        
         self.field_centric = False
         self.allow_reverse = False
         self.squared_inputs = True
         self.snap_rotation = False
+        self.wait_for_align = False
+        self.threshold_input_vectors = True
         
-        self.width = 22
-        self.length = 18.5
+        self.width = (22/12)/2
+        self.length = (18.5/12)/2
         
     @property
     def chassis_dimension(self):
@@ -98,6 +110,17 @@ class SwerveDrive:
             
             if value:
                 self.navx.reset()
+                
+    @property
+    def wait_for_align(self):
+        return self._wait_for_align
+    
+    @wait_for_align.setter
+    def wait_for_align(self, value):
+        self._wait_for_align = value
+        
+        for module in self.modules.values():
+            module.wait_for_align = value
         
     @staticmethod
     def square_input(input):
@@ -120,6 +143,117 @@ class SwerveDrive:
                 data[key] = data[key] / maxMagnitude
         return data
     
+    def enable_position_prediction(self, zero_position = True):
+        if not self.modules['front_left'].has_drive_encoder or not self.modules['rear_right'].has_drive_encoder:
+            if not self.modules['rear_left'].has_drive_encoder or not self.modules['front_right'].has_drive_encoder:
+                raise 'Not enough drive encoders to predict position'
+        
+        self.predict_position = True
+        
+        if zero_position:
+            self._predicted_position['fwd'] = 0.0
+            self._predicted_position['strafe'] = 0.0
+            self._predicted_position['rcw'] = 0.0
+            
+            for key in self.modules:
+                self.modules[key].zero_drive_encoder()
+    
+    def disable_position_prediction(self, zero_position = False):
+        self.predict_position = False
+        
+        if zero_position:
+            self._predicted_position['fwd'] = 0.0
+            self._predicted_position['strafe'] = 0.0
+            self._predicted_position['rcw'] = 0.0
+            
+    def _predict_position(self):
+        #TODO: Clean up this function. its a mess.
+        if self.modules['front_left'].has_drive_encoder and self.modules['rear_right'].has_drive_encoder:
+            
+            #print('Predicting Position!!!!!!')
+            fl_dist = self.modules['front_left'].get_drive_encoder_distance()
+            fl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_left'].get_voltage())
+            #if abs(fl_dist) < 0.1:
+                #return
+            self.modules['front_left'].zero_drive_encoder()
+            
+            
+            rr_dist = self.modules['rear_right'].get_drive_encoder_distance()
+            rr_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['rear_right'].get_voltage())
+            self.modules['rear_right'].zero_drive_encoder()
+            
+            radius = math.sqrt(((self.length) ** 2)+((self.width) ** 2))
+            
+            # degree / 360 = dist / 2 * pi * r
+            # C = 2 * pi * r
+            # degree / 360 = dist / C
+            # degree = 360 * (dist / C)
+            # d * (360 / 2 * pi * r) = degree
+            
+            fl_y = -math.cos(fl_theta) * fl_dist
+            fl_x = math.sin(fl_theta) * fl_dist
+            fl_rcw = -((math.cos((fl_theta + (math.pi/4)) % (2*math.pi)) * fl_dist) / (2*math.pi*radius)) * 360#TODO: Check rotation math
+            
+            
+            rr_y = math.cos(rr_theta) * rr_dist
+            rr_x = -math.sin(rr_theta) * rr_dist
+            rr_rcw = -((math.cos((rr_theta + (math.pi/4)) % (2*math.pi)) * rr_dist) / (2*math.pi*radius)) * 360
+            
+            #raise 'hi'
+            self._predicted_position['fwd'] += (fl_y + rr_y) / 2 #Halved because measured from two drive encoders
+            self._predicted_position['strafe'] += (fl_x + rr_x) / 2
+            self._predicted_position['rcw'] += (fl_rcw + rr_rcw) #This should be halved but isn't becuase robots are strange 
+            
+        if self.modules['front_right'].has_drive_encoder and self.modules['rear_left'].has_drive_encoder:
+            fr_dist = self.modules['front_right'].get_drive_encoder_distance()
+            fr_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_right'].get_voltage())
+            self.modules['front_right'].zero_drive_encoder()
+            
+            rl_dist = self.modules['rear_left'].get_drive_encoder_distance()
+            rl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['rear_left'].get_voltage())
+            self.modules['rear_left'].zero_drive_encoder()
+            
+            radius = math.sqrt((self.length ** 2)+(self.width ** 2))
+            
+            fr_x = math.cos(fr_theta) * fr_dist
+            fr_y = math.sin(fr_theta) * fr_dist
+            fr_rcw = -((math.cos((fr_theta + (math.pi/4)) % (2*math.pi)) * fr_dist) / (2*math.pi*radius)) * 360 #TODO: Check rotation math
+            
+            rl_x = math.cos(rl_theta) * rl_dist
+            rl_y = math.sin(rl_theta) * rl_dist
+            rl_rcw = ((math.cos((rl_theta + (math.pi/4)) % (2*math.pi)) * rl_dist) / (2*math.pi*radius)) * 360
+            
+            self._predicted_position['fwd'] += (fr_y + rl_y) / 2
+            self._predicted_position['strafe'] += (fr_x + rl_x) / 2
+            self._predicted_position['rcw'] += (fr_rcw + rl_rcw)
+        
+    def get_predicted_x(self):
+        if not self.predict_position:
+            return None
+        
+        return self._predicted_position['strafe']
+    
+    def get_predicted_y(self):
+        if not self.predict_position:
+            return None
+        
+        return self._predicted_position['fwd']
+    
+    def get_predicted_theta(self):
+        if not self.predict_position:
+            return None
+        
+        return self._predicted_position['rcw']
+    
+    def set_raw_fwd(self, fwd):
+        self._requested_vectors['fwd'] = fwd
+
+    def set_raw_strafe(self, strafe):
+        self._requested_vectors['strafe'] = strafe
+    
+    def set_raw_rcw(self, rcw):
+        self._requested_vectors['rcw'] = rcw
+    
     def move(self, fwd, strafe, rcw):
         '''
         Calulates the speed and angle for each wheel given the requested movement
@@ -127,6 +261,11 @@ class SwerveDrive:
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
         '''
+        '''
+        #Zero request vectors for saftey reasons
+        self._requested_vectors['fwd'] = 0.0
+        self._requested_vectors['strafe'] = 0.0
+        self._requested_vectors['rcw'] = 0.0'''
         
         if self.squared_inputs:
             fwd = self.square_input(fwd)
@@ -173,7 +312,8 @@ class SwerveDrive:
             
             fwd = fwdX + strafeY
             strafe = fwdY + strafeX
-            
+        
+        
         self._requested_vectors['fwd'] = fwd
         self._requested_vectors['strafe'] = strafe
         self._requested_vectors['rcw'] = rcw
@@ -185,18 +325,19 @@ class SwerveDrive:
         '''
         
         #Does nothing if the values are lower than the input thresh
-        if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
-           self._requested_vectors['fwd'] = 0
-        
-        if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
-            self._requested_vectors['strafe'] = 0
-        
-        if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
-            self._requested_vectors['rcw'] = 0
-                
-        if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
-            self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
-            return
+        if self.threshold_input_vectors:
+            if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
+               self._requested_vectors['fwd'] = 0
+            
+            if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
+                self._requested_vectors['strafe'] = 0
+            
+            if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
+                self._requested_vectors['rcw'] = 0
+                    
+            if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
+                self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
+                return
 
         ratio = math.sqrt((self.length ** 2)+(self.width ** 2))
         # Velocities per quadrant
@@ -230,6 +371,14 @@ class SwerveDrive:
         self._requested_angles['rear_left'] = rl_angle
         
         self._requested_speeds = self.normalizeDictionary(self._requested_speeds)
+        
+        #print(self._requested_vectors)
+        
+        '''
+        #Zero request vectors for saftey reasons
+        self._requested_vectors['fwd'] = 0.0
+        self._requested_vectors['strafe'] = 0.0
+        self._requested_vectors['rcw'] = 0.0'''
 
     def execute(self):
         '''
@@ -238,8 +387,17 @@ class SwerveDrive:
         '''
         self.update_smartdash()
         
+        if self.predict_position:
+            self._predict_position()
+            
+            #print('Predicting:')
+            #print(self._predicted_position)
+            #print('\n')
         
         self._calculate_vectors()
+        
+        #print("Requested speeds: %s" % self._requested_speeds)
+        
         for key in self.modules:
             self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
             
@@ -256,6 +414,12 @@ class SwerveDrive:
         self.sd.putBoolean("drive/drive/field_centric", self.field_centric)
         self.sd.putBoolean("drive/drive/allow_reverse", self.allow_reverse)
         self.sd.putBoolean("drive/drive/snap_rotation", self.snap_rotation)
+        self.sd.putBoolean("drive/drive/predict_position", self.predict_position)
+        
+        if self.predict_position:
+            self.sd.putNumber("drive/drive/predicted/x", self._predicted_position['strafe'])
+            self.sd.putNumber("drive/drive/predicted/y", self._predicted_position['fwd'])
+            self.sd.putNumber("drive/drive/predicted/rot", self._predicted_position['rcw'])
             
         if self.debugging:
             for key in self._requested_angles:
