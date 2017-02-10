@@ -15,13 +15,10 @@ class AngleController(BasePIDComponent):
     '''
     
     drive = SwerveDrive
-    
-    robot_setpoint = tunable(0)
-    robot_angle = tunable(0)
 
-    kP = tunable(0.01)
+    kP = tunable(0.0004)
     kI = tunable(0.000)
-    kD = tunable(0.00)
+    kD = tunable(0.008)
     kF = tunable(0.0)
     
     kToleranceDegrees = tunable(3.5)
@@ -46,6 +43,7 @@ class AngleController(BasePIDComponent):
        
     def align_to(self, angle):
         """Moves the robot and turns it to a specified absolute direction"""
+        #print(angle)
         self.setpoint = angle
 
     def is_aligned(self):
@@ -68,7 +66,8 @@ class AngleController(BasePIDComponent):
                 error = error - 360.0
             else:
                 error = error + 360.0
-                
+        
+        print(abs(error))
         return abs(error) < self.kToleranceDegrees
 
     def reset_angle(self):
@@ -83,32 +82,8 @@ class AngleController(BasePIDComponent):
                 error = error + 360.0
                 
         return error
-        
-    '''
-    def pidWrite(self, output):
-        """This function is invoked periodically by the PID Controller,
-        based upon navX MXP yaw angle input and PID Coefficients.
-        """
-        
-        # old wheels
-        # x: 0.25 to 0.5
-        # y: 0.15 to 0.6
-        
-        # new wheels @ bbn
-        # x: 0.55 to 1.0
-        # y: 0.15 to 0.6
-        
-        # The pure output of the PID controller isn't enough.. 
-        # .. need to scale between some min out
-        
-        # scale input range
-        
-        # scale between 0 and max
-        rotation_rate = math.copysign(abs(output)*0.45+0.55, output)
-        super().pidWrite(rotation_rate)'''
     
     def execute(self):
-        
         super().execute()
         
         # rate will never be None when the component is not enabled
@@ -116,9 +91,6 @@ class AngleController(BasePIDComponent):
             if self.is_aligned():
                 self.drive.set_raw_rcw(0)
             else:
+                print('Setting rotation: %s' % self.rate)
                 self.drive.set_raw_rcw(self.rate)
                 
-        self.report += 1
-        if self.report % 5 == 0:
-            self.robot_angle = self.get_angle()
-            self.robot_setpoint = self.setpoint

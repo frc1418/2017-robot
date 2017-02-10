@@ -63,6 +63,7 @@ class SwerveModule:
         self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False);
         
         self.has_drive_encoder = kwargs.pop("has_drive_encoder", False)
+        self.wait_for_align = kwargs.pop("wait_for_align", False)
         self.drive_encoder_zero = 0
 
     def get_voltage(self):
@@ -187,8 +188,10 @@ class SwerveModule:
         
         self._pid_controller.setSetpoint(self._requested_voltage)
         
-        #if abs(self._pid_controller.get()) < 0.1:
-        self.driveMotor.set(self._requested_speed)
+        #print(self._requested_speed)
+        if abs(self._pid_controller.get()) < 0.1 or not self.wait_for_align:
+            self.driveMotor.set(self._requested_speed)
+            
         self.update_smartdash()
 
     def update_smartdash(self):

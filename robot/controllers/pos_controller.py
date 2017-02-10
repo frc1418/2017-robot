@@ -10,18 +10,16 @@ class XPosController(BasePIDComponent):
     
     drive = swervedrive.SwerveDrive
     
-    kP = tunable(0.1)
-    kI = tunable(0.0)
+    kP = tunable(0.05)
+    kI = tunable(0.0004)
     kD = tunable(0.0)
     kF = tunable(0.0)
         
     kToleranceFeet = tunable(0.25)
     kIzone = tunable(0.25)
         
-    def __init__(self, pid_input=None, table_name='x_ctrl'):
-        if pid_input is None:
-            pid_input=self.get_position
-        super().__init__(pid_input, table_name)    
+    def __init__(self):
+        super().__init__(self.get_position, 'x_ctrl')    
         #self.pid.setOutputRange(-1.0, 1.0)
     
     def get_position(self):
@@ -31,6 +29,7 @@ class XPosController(BasePIDComponent):
         self.setpoint = position
         
     def is_at_location(self):
+        #print('DIST FROM LOCATION: %s' % abs(self.get_position() - self.setpoint))
         return self.enabled and \
                 abs(self.get_position() - self.setpoint) < self.kToleranceFeet
     
@@ -44,13 +43,30 @@ class XPosController(BasePIDComponent):
             else:
                 self.drive.set_raw_strafe(self.rate)
 
-class YPosController(XPosController):
+class YPosController(BasePIDComponent):
+        
+    drive = swervedrive.SwerveDrive
+    
+    kP = tunable(0.05)
+    kI = tunable(0.0004)
+    kD = tunable(0.0)
+    kF = tunable(0.0)
+        
+    kToleranceFeet = tunable(0.25)
+    kIzone = tunable(0.25)
         
     def __init__(self):
-        super().__init__(table_name='y_ctrl')
+        super().__init__(self.get_position, 'y_ctrl')    
     
     def get_position(self):
         return self.drive.get_predicted_y() / 1.0
+    
+    def move_to(self, position):
+        self.setpoint = position
+        
+    def is_at_location(self):
+        #print('DIST FROM LOCATION: %s' % abs(self.get_position() - self.setpoint))
+        return self.enabled and abs(self.get_position() - self.setpoint) < self.kToleranceFeet
     
     def execute(self):
         

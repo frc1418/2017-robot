@@ -40,7 +40,6 @@ class BasePIDComponent:
         self._has_setpoint = True
         
     def compute_error(self, setpoint, pid_input):
-        print(pid_input)
         return setpoint - pid_input
     
     def pidWrite(self, output):

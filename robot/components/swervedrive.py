@@ -71,6 +71,8 @@ class SwerveDrive:
         self.allow_reverse = False
         self.squared_inputs = True
         self.snap_rotation = False
+        self.wait_for_align = False
+        self.threshold_input_vectors = True
         
         self.width = (22/12)/2
         self.length = (18.5/12)/2
@@ -108,6 +110,17 @@ class SwerveDrive:
             
             if value:
                 self.navx.reset()
+                
+    @property
+    def wait_for_align(self):
+        return self._wait_for_align
+    
+    @wait_for_align.setter
+    def wait_for_align(self, value):
+        self._wait_for_align = value
+        
+        for module in self.modules.values():
+            module.wait_for_align = value
         
     @staticmethod
     def square_input(input):
@@ -157,7 +170,7 @@ class SwerveDrive:
         #TODO: Clean up this function. its a mess.
         if self.modules['front_left'].has_drive_encoder and self.modules['rear_right'].has_drive_encoder:
             
-            print('Predicting Position!!!!!!')
+            #print('Predicting Position!!!!!!')
             fl_dist = self.modules['front_left'].get_drive_encoder_distance()
             fl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_left'].get_voltage())
             #if abs(fl_dist) < 0.1:
@@ -233,11 +246,7 @@ class SwerveDrive:
         return self._predicted_position['rcw']
     
     def set_raw_fwd(self, fwd):
-        print('Before Requesting:')
-        print(self._requested_vectors)
         self._requested_vectors['fwd'] = fwd
-        print('After Requesting:')
-        print(self._requested_vectors)
 
     def set_raw_strafe(self, strafe):
         self._requested_vectors['strafe'] = strafe
@@ -252,6 +261,11 @@ class SwerveDrive:
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
         '''
+        '''
+        #Zero request vectors for saftey reasons
+        self._requested_vectors['fwd'] = 0.0
+        self._requested_vectors['strafe'] = 0.0
+        self._requested_vectors['rcw'] = 0.0'''
         
         if self.squared_inputs:
             fwd = self.square_input(fwd)
@@ -298,7 +312,8 @@ class SwerveDrive:
             
             fwd = fwdX + strafeY
             strafe = fwdY + strafeX
-            
+        
+        
         self._requested_vectors['fwd'] = fwd
         self._requested_vectors['strafe'] = strafe
         self._requested_vectors['rcw'] = rcw
@@ -310,18 +325,19 @@ class SwerveDrive:
         '''
         
         #Does nothing if the values are lower than the input thresh
-        if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
-           self._requested_vectors['fwd'] = 0
-        
-        if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
-            self._requested_vectors['strafe'] = 0
-        
-        if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
-            self._requested_vectors['rcw'] = 0
-                
-        if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
-            self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
-            return
+        if self.threshold_input_vectors:
+            if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
+               self._requested_vectors['fwd'] = 0
+            
+            if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
+                self._requested_vectors['strafe'] = 0
+            
+            if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
+                self._requested_vectors['rcw'] = 0
+                    
+            if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
+                self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
+                return
 
         ratio = math.sqrt((self.length ** 2)+(self.width ** 2))
         # Velocities per quadrant
@@ -355,6 +371,14 @@ class SwerveDrive:
         self._requested_angles['rear_left'] = rl_angle
         
         self._requested_speeds = self.normalizeDictionary(self._requested_speeds)
+        
+        #print(self._requested_vectors)
+        
+        '''
+        #Zero request vectors for saftey reasons
+        self._requested_vectors['fwd'] = 0.0
+        self._requested_vectors['strafe'] = 0.0
+        self._requested_vectors['rcw'] = 0.0'''
 
     def execute(self):
         '''
@@ -372,8 +396,7 @@ class SwerveDrive:
         
         self._calculate_vectors()
         
-        
-        
+        #print("Requested speeds: %s" % self._requested_speeds)
         
         for key in self.modules:
             self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])

@@ -13,6 +13,7 @@ from networktables.networktable import NetworkTable
 
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 from controllers.pos_controller import XPosController, YPosController
+from controllers.angle_controller import AngleController
 
 
 
@@ -23,8 +24,10 @@ class MyRobot(magicbot.MagicRobot):
     gear_picker = gearpicker.GearPicker
     climber = climber.Climber
     gimbal = gimbal.Gimbal
+    
     y_controller = YPosController
     x_controller = XPosController
+    angle_controller = AngleController
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
