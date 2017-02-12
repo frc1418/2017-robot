@@ -48,10 +48,10 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Motors
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.92, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.08)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.72)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=1.58, has_drive_encoder=True)
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93, has_drive_encoder=True)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.57, inverted = True)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.74)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.03, has_drive_encoder=True, inverted = True)
 
 
         # Shooting motors
