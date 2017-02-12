@@ -143,6 +143,31 @@ class SwerveDrive:
                 data[key] = data[key] / maxMagnitude
         return data
     
+    def prepare_for_teleop(self):
+        self._requested_vectors = {
+                'fwd': 0,
+                'strafe': 0,
+                'rcw': 0
+        }
+        
+        self._requested_angles = {
+                'front_right': 0,
+                'front_left': 0,
+                'rear_left': 0,
+                'rear_right': 0
+        }
+        
+        self._requested_speeds = {
+                'front_right': 0,
+                'front_left': 0,
+                'rear_left': 0,
+                'rear_right': 0
+        }
+        
+        for module in self.modules.values():
+            module.prepare_for_teleop()
+        
+    
     def enable_position_prediction(self, zero_position = True):
         if not self.modules['front_left'].has_drive_encoder or not self.modules['rear_right'].has_drive_encoder:
             if not self.modules['rear_left'].has_drive_encoder or not self.modules['front_right'].has_drive_encoder:
@@ -165,6 +190,11 @@ class SwerveDrive:
             self._predicted_position['fwd'] = 0.0
             self._predicted_position['strafe'] = 0.0
             self._predicted_position['rcw'] = 0.0
+            
+    def reset_position_prediction(self):
+        self._predicted_position['fwd'] = 0.0
+        self._predicted_position['strafe'] = 0.0
+        self._predicted_position['rcw'] = 0.0
             
     def _predict_position(self):
         #TODO: Clean up this function. its a mess.

@@ -18,6 +18,9 @@ class BasePIDComponent:
     
     ramp = 0.1
     
+    MIN_RAW_OUTPUT = -1.0
+    MAX_RAW_OUTPUT = 1.0
+    
     def __init__(self, pid_input, table_name):
         
         self.enabled = False
@@ -29,6 +32,9 @@ class BasePIDComponent:
         self._setpoint = None
         
         self._pid_input = pid_input
+        
+        self._min = -1.0
+        self._max = 1.0
   
     @property
     def setpoint(self):
@@ -44,7 +50,12 @@ class BasePIDComponent:
     
     def pidWrite(self, output):
         self.rate = output
-    
+        
+    def set_output_range(self, min, max):
+        self._min = min
+        self._max = max
+        
+        
     def execute(self):
         
         if self._has_setpoint:
@@ -62,8 +73,12 @@ class BasePIDComponent:
             else:
                 self.err += err
             
+            print("Error: ", err, " P: ", self.kP," I: ", self.kI, " D: ", self.kD)
             output = err*self.kP + self.kI*self.err + self.kD*(err - self._last_err)
-            output = min(1.0, max(output, -1.0))
+            output = min(self.MAX_RAW_OUTPUT, max(output, self.MIN_RAW_OUTPUT))
+            
+            #Scale to min and max output
+            #output = ((output - self.MIN_RAW_OUTPUT) / (self.MAX_RAW_OUTPUT - self.MIN_RAW_OUTPUT) * (self._max - self._min)) + self._min
             
             self._last_output = output
             self._last_err = err

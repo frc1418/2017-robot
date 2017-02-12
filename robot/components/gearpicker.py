@@ -18,8 +18,8 @@ class GearPicker:
     def setup(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
 
-        self._picker_state = self.picker.get()
-        self._pivot_state = self.pivot.get()
+        self._picker_state = 1
+        self._pivot_state = 1
 
         self.intake_on = False
 

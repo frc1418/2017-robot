@@ -19,7 +19,10 @@ class XPosController(BasePIDComponent):
     kIzone = tunable(0.25)
         
     def __init__(self):
-        super().__init__(self.get_position, 'x_ctrl')    
+        super().__init__(self.get_position, 'x_ctrl')
+        
+        self.MIN_RAW_OUTPUT = -0.5
+        self.MAX_RAW_OUTPUT = 0.5 
         #self.pid.setOutputRange(-1.0, 1.0)
     
     def get_position(self):
@@ -56,7 +59,10 @@ class YPosController(BasePIDComponent):
     kIzone = tunable(0.25)
         
     def __init__(self):
-        super().__init__(self.get_position, 'y_ctrl')    
+        super().__init__(self.get_position, 'y_ctrl')  
+        
+        self.MIN_RAW_OUTPUT = -0.5
+        self.MAX_RAW_OUTPUT = 0.5   
     
     def get_position(self):
         return self.drive.get_predicted_y() / 1.0
