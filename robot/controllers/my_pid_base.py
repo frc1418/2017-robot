@@ -1,4 +1,5 @@
 from networktables import NetworkTable
+import math
 
 class BasePIDComponent:
     '''
@@ -21,6 +22,9 @@ class BasePIDComponent:
     MIN_RAW_OUTPUT = -1.0
     MAX_RAW_OUTPUT = 1.0
     
+    MIN_ABS_OUTPUT = 0.0
+    MAX_ABS_OUTPUT = 1.0
+    
     def __init__(self, pid_input, table_name):
         
         self.enabled = False
@@ -33,8 +37,8 @@ class BasePIDComponent:
         
         self._pid_input = pid_input
         
-        self._min = -1.0
-        self._max = 1.0
+        self._abs_min = 0.0
+        self._abs_max = 1.0
   
     @property
     def setpoint(self):
@@ -51,9 +55,9 @@ class BasePIDComponent:
     def pidWrite(self, output):
         self.rate = output
         
-    def set_output_range(self, min, max):
-        self._min = min
-        self._max = max
+    def set_abs_output_range(self, min, max):
+        self._abs_min = min
+        self._abs_max = max
         
         
     def execute(self):
@@ -78,7 +82,8 @@ class BasePIDComponent:
             output = min(self.MAX_RAW_OUTPUT, max(output, self.MIN_RAW_OUTPUT))
             
             #Scale to min and max output
-            #output = ((output - self.MIN_RAW_OUTPUT) / (self.MAX_RAW_OUTPUT - self.MIN_RAW_OUTPUT) * (self._max - self._min)) + self._min
+            scaled_output = ((abs(output) - self.MIN_ABS_OUTPUT) / (self.MAX_ABS_OUTPUT - self.MIN_ABS_OUTPUT) * (self._abs_max - self._abs_min)) + self._abs_min
+            output = math.copysign(scaled_output, output)
             
             self._last_output = output
             self._last_err = err
