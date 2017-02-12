@@ -52,6 +52,7 @@ class MyRobot(magicbot.MagicRobot):
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.72)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=1.58, has_drive_encoder=True)
 
+
         # Shooting motors
         self.shooter_motor = ctre.CANTalon(15)
         self.belt_motor = wpilib.spark.Spark(9)
@@ -63,8 +64,8 @@ class MyRobot(magicbot.MagicRobot):
         self.pivot = wpilib.DoubleSolenoid(4, 5)
 
         # Toggling button on secondary joystick
-        self.pivot_toggle_button = ButtonDebouncer(self.secondary_joystick, 3)
         self.pivot_toggle_button = ButtonDebouncer(self.secondary_joystick, 2)
+
 
         # Or, up and down buttons on right joystick
         self.pivot_down_button = ButtonDebouncer(self.right_joystick, 2)
@@ -115,12 +116,6 @@ class MyRobot(magicbot.MagicRobot):
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
         self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
-        
-        if self.predict_position.get():
-            if self.drive.predict_position:
-                self.drive.disable_position_prediction()
-            elif not self.drive.predict_position:
-                self.drive.enable_position_prediction()
 
         # Pivot toggling button on secondary joystick
         if self.pivot_toggle_button.get():
