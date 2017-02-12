@@ -88,6 +88,10 @@ class MyRobot(magicbot.MagicRobot):
 
         self.pdp = wpilib.PowerDistributionPanel(0)
 
+    def robotInit(self):
+        super().robotInit()
+        
+        wpilib.CameraServer.launch('camera/vision.py:main')
 
     def autonomous(self):
         """Prepare for autonomous mode."""
