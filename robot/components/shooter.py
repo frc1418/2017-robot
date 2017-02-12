@@ -25,5 +25,5 @@ class Shooter(StateMachine):
     @state  
     def feed_shoot(self):
         self.shooter_motor.set(self.shooter_speed)
-        self.belt_motor.set(1)
+        self.belt_motor.set(-1)
         
