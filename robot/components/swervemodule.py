@@ -87,6 +87,10 @@ class SwerveModule:
         
         self.drive_encoder_zero = self.driveMotor.getPosition()
     
+    def prepare_for_teleop(self):
+        self._requested_voltage = self.encoder.getVoltage()
+        self._requested_speed = 0
+    
     @staticmethod
     def voltage_to_degrees(voltage):
         '''
