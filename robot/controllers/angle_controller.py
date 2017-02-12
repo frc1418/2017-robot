@@ -4,7 +4,7 @@ import math
 import hal
 
 from magicbot import tunable
-from robotpy_ext.common_drivers.navx.ahrs import AHRS
+from robotpy_ext.common_drivers import navx
 
 from components.swervedrive import SwerveDrive
 from .my_pid_base import BasePIDComponent
@@ -16,19 +16,22 @@ class AngleController(BasePIDComponent):
     
     drive = SwerveDrive
 
-    kP = tunable(0.0004)
-    kI = tunable(0.000)
-    kD = tunable(0.008)
+    kP = tunable(0.014)
+    kI = tunable(0.0)
+    kD = tunable(0.0)
     kF = tunable(0.0)
     
-    kToleranceDegrees = tunable(3.5)
-    kIzone = tunable(3.5)
+    kToleranceDegrees = tunable(2)
+    kIzone = tunable(2)
+    
+    navx = navx.AHRS
     
     def __init__(self):
         
-        self.ahrs = AHRS.create_spi()
+        super().__init__(self.get_angle, 'angle_ctrl')
         
-        super().__init__(self.ahrs.getYaw, 'angle_ctrl')
+        self.MIN_RAW_OUTPUT = -0.30
+        self.MAX_RAW_OUTPUT = 0.30
         
         if hasattr(self, 'pid'):
             self.pid.setInputRange(-180.0,  180.0)
@@ -39,7 +42,7 @@ class AngleController(BasePIDComponent):
         
     def get_angle(self):
         """Returns the robot's current heading"""
-        return self.ahrs.getYaw()
+        return self.navx.getYaw()
        
     def align_to(self, angle):
         """Moves the robot and turns it to a specified absolute direction"""
@@ -67,14 +70,13 @@ class AngleController(BasePIDComponent):
             else:
                 error = error + 360.0
         
-        print(abs(error))
         return abs(error) < self.kToleranceDegrees
 
     def reset_angle(self):
-        self.ahrs.reset()
+        self.navx.reset()
     
     def compute_error(self, setpoint, pid_input):
-        error = setpoint - pid_input
+        error = pid_input - setpoint
         if abs(error) > 180.0:
             if error > 0:
                 error = error - 360.0

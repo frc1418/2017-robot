@@ -2,6 +2,7 @@ from robotpy_ext.autonomous import state, timed_state, StatefulAutonomous
 from components import swervedrive
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController
+from controllers.position_history import PositionHistory
 
 import wpilib
 from networktables import NetworkTable
@@ -25,7 +26,7 @@ class DriveStraightTest(StatefulAutonomous):
     DEFAULT = False
     
     drive = swervedrive.SwerveDrive
-    y_controller = YPosController
+    y_ctrl = YPosController
     
     drive_distance_feet = tunable(5) #Feet
         
@@ -36,10 +37,10 @@ class DriveStraightTest(StatefulAutonomous):
             self.sd = NetworkTable.getTable("SmartDashboard")
             self.drive.enable_position_prediction()
         
-        self.y_controller.move_to(self.drive_distance_feet)
-        self.sd.putNumber("TESTING: ", self.y_controller.get_position())
+        self.y_ctrl.move_to(self.drive_distance_feet)
+        self.sd.putNumber("TESTING: ", self.y_ctrl.get_position())
         
-        if self.y_controller.is_at_location():
+        if self.y_ctrl.is_at_location():
             self.next_state('done')
             
     @state
@@ -53,24 +54,27 @@ class DriveStraightTest(StatefulAutonomous):
         
 class GyroTest(StatefulAutonomous):
     MODE_NAME = 'Gyro_Test'
-    DEFAULT = True
+    DEFAULT = False
     
     drive = swervedrive.SwerveDrive
-    angle_controller = AngleController
+    angle_ctrl = AngleController
     
-    align_to = tunable(45) #Deg
+    align_to = tunable(-30) #Deg
     
     @timed_state(duration=10.0, first=True, next_state='failed_align')
     def align(self, initial_call):
         if initial_call:
-            self.angle_controller.reset_angle()
+            self.angle_ctrl.reset_angle()
+            
+            self.drive.allow_reverse = True
             self.drive.wait_for_align = True
+            
             self.drive.threshold_input_vectors = False
             
         #print('About to set angle')
-        self.angle_controller.align_to(self.align_to)
+        self.angle_ctrl.align_to(self.align_to)
         
-        if self.angle_controller.is_aligned():
+        if self.angle_ctrl.is_aligned():
             self.next_state('done')
             
     @state
@@ -88,8 +92,8 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     DEFAULT = False
     
     drive = swervedrive.SwerveDrive
-    y_controller = YPosController
-    angle_controller = AngleController
+    y_ctrl = YPosController
+    angle_ctrl = AngleController
     
     drive_distance_feet = tunable(5) #Feet
     align_to = tunable(0) #Deg
@@ -98,13 +102,14 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
     def drive_distance(self, initial_call):
         if initial_call:
-            self.angle_controller.reset_angle()
+            self.drive.field_centric = True
+            self.angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()
         
-        self.angle_controller.align_to(align_to)
-        self.y_controller.move_to(self.drive_distance_feet)
+        self.angle_ctrl.align_to(self.align_to)
+        self.y_ctrl.move_to(self.drive_distance_feet)
         
-        if self.y_controller.is_at_location():
+        if self.y_ctrl.is_at_location():
             self.next_state('done')
             
     @state
@@ -114,7 +119,30 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     @state
     def done(self):
         self.drive.disable_position_prediction()
+
+class AlignAndPlace(StatefulAutonomous):
+    MODE_NAME = 'Align_and_place'
+    DEFAULT = False
+    
+    drive = swervedrive.SwerveDrive
+    y_ctrl = YPosController
+    x_ctrl = XPosController
+    angle_ctrl = AngleController
+    pos_history = PositionHistory
+    
+    @timed_state(duration=10.0, first=True, next_state='failed_distance')
+    def drive_distance(self, initial_call):
+        if initial_call:
+            self.drive.enable_position_prediction()
+            self.pos_history.enable()
+            
+    @state
+    def failed_distance(self):
+        self.next_state('done')
         
+    @state
+    def done(self):
+        self.drive.disable_position_prediction()
         
     
     

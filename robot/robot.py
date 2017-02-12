@@ -14,8 +14,7 @@ from networktables.networktable import NetworkTable
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController
-
-
+from controllers.position_history import PositionHistory
 
 class MyRobot(magicbot.MagicRobot):
 
@@ -25,9 +24,11 @@ class MyRobot(magicbot.MagicRobot):
     climber = climber.Climber
     gimbal = gimbal.Gimbal
     
-    y_controller = YPosController
-    x_controller = XPosController
-    angle_controller = AngleController
+    y_ctrl = YPosController
+    x_ctrl = XPosController
+    angle_ctrl = AngleController
+    
+    pos_history = PositionHistory
 
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
@@ -88,6 +89,10 @@ class MyRobot(magicbot.MagicRobot):
 
     def autonomous(self):
         """Prepare for autonomous mode."""
+        #self.drive.allow_reverse = True
+        self.drive.wait_for_align = True
+        self.drive.threshold_input_vectors = False
+        
         magicbot.MagicRobot.autonomous(self)
 
     def disabledPeriodic(self):
@@ -109,6 +114,12 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
+        self.drive.prepare_for_teleop()
+        
+        self.drive.allow_reverse = False
+        self.drive.wait_for_align = False
+        self.drive.threshold_input_vectors = True
+        
         self.drive.disable_position_prediction()
 
     def teleopPeriodic(self):
@@ -144,6 +155,7 @@ class MyRobot(magicbot.MagicRobot):
             self.shooter.shoot()
         else:
             self.shooter.stop()
+            
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
 
