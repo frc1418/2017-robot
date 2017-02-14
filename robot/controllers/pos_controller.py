@@ -10,8 +10,8 @@ class XPosController(BasePIDComponent):
     
     drive = swervedrive.SwerveDrive
     
-    kP = tunable(0.05)
-    kI = tunable(0.0004)
+    kP = tunable(0.09)
+    kI = tunable(0.0)
     kD = tunable(0.0)
     kF = tunable(0.0)
         
@@ -21,8 +21,7 @@ class XPosController(BasePIDComponent):
     def __init__(self):
         super().__init__(self.get_position, 'x_ctrl')
         
-        self.MIN_RAW_OUTPUT = -0.5
-        self.MAX_RAW_OUTPUT = 0.5 
+        self.set_abs_output_range(0.16, 0.65)
         #self.pid.setOutputRange(-1.0, 1.0)
     
     def get_position(self):
@@ -35,6 +34,9 @@ class XPosController(BasePIDComponent):
         #print('DIST FROM LOCATION: %s' % abs(self.get_position() - self.setpoint))
         return self.enabled and \
                 abs(self.get_position() - self.setpoint) < self.kToleranceFeet
+    
+    def pidWrite(self, output):
+        self.rate = -output
     
     def execute(self):
         
@@ -50,8 +52,8 @@ class YPosController(BasePIDComponent):
         
     drive = swervedrive.SwerveDrive
     
-    kP = tunable(0.05)
-    kI = tunable(0.0004)
+    kP = tunable(0.09)
+    kI = tunable(0.0)
     kD = tunable(0.0)
     kF = tunable(0.0)
         
@@ -61,8 +63,7 @@ class YPosController(BasePIDComponent):
     def __init__(self):
         super().__init__(self.get_position, 'y_ctrl')  
         
-        self.MIN_RAW_OUTPUT = -0.5
-        self.MAX_RAW_OUTPUT = 0.5   
+        self.set_abs_output_range(0.16, 0.65)   
     
     def get_position(self):
         return self.drive.get_predicted_y() / 1.0

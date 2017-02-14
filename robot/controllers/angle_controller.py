@@ -16,7 +16,7 @@ class AngleController(BasePIDComponent):
     
     drive = SwerveDrive
 
-    kP = tunable(0.014)
+    kP = tunable(0.003)
     kI = tunable(0.0)
     kD = tunable(0.0)
     kF = tunable(0.0)
@@ -30,8 +30,7 @@ class AngleController(BasePIDComponent):
         
         super().__init__(self.get_angle, 'angle_ctrl')
         
-        self.MIN_RAW_OUTPUT = -0.30
-        self.MAX_RAW_OUTPUT = 0.30
+        self.set_abs_output_range(0.18, 0.6)
         
         if hasattr(self, 'pid'):
             self.pid.setInputRange(-180.0,  180.0)
@@ -96,3 +95,18 @@ class AngleController(BasePIDComponent):
                 print('Setting rotation: %s' % self.rate)
                 self.drive.set_raw_rcw(self.rate)
                 
+class MovingAngleController(AngleController):
+    
+    kP = tunable(0.002)
+    kI = tunable(0.0)
+    kD = tunable(0.0)
+    kF = tunable(0.0)
+    
+    kToleranceDegrees = tunable(2)
+    kIzone = tunable(2)
+                
+    def __init__(self):
+        
+        super().__init__()
+        
+        self.set_abs_output_range(0.06, 0.5)

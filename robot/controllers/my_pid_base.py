@@ -77,13 +77,14 @@ class BasePIDComponent:
             else:
                 self.err += err
             
-            print("Error: ", err, " P: ", self.kP," I: ", self.kI, " D: ", self.kD)
+            
             output = err*self.kP + self.kI*self.err + self.kD*(err - self._last_err)
             output = min(self.MAX_RAW_OUTPUT, max(output, self.MIN_RAW_OUTPUT))
             
             #Scale to min and max output
             scaled_output = ((abs(output) - self.MIN_ABS_OUTPUT) / (self.MAX_ABS_OUTPUT - self.MIN_ABS_OUTPUT) * (self._abs_max - self._abs_min)) + self._abs_min
             output = math.copysign(scaled_output, output)
+            print("Output: ", output, "Error: ", err, " P: ", self.kP," I: ", self.kI, " D: ", self.kD)
             
             self._last_output = output
             self._last_err = err

@@ -1,7 +1,7 @@
 from robotpy_ext.autonomous import state, timed_state, StatefulAutonomous
 from components import swervedrive
 from controllers.pos_controller import XPosController, YPosController
-from controllers.angle_controller import AngleController
+from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
 
 import wpilib
@@ -50,6 +50,35 @@ class DriveStraightTest(StatefulAutonomous):
     @state
     def done(self):
         self.drive.disable_position_prediction()
+
+class DriveLeftTest(StatefulAutonomous):
+    MODE_NAME = 'Drive_Left_Test'
+    DEFAULT = False
+    
+    drive = swervedrive.SwerveDrive
+    x_ctrl = XPosController
+    
+    drive_distance_feet = tunable(-5) #Feet
+        
+    
+    @timed_state(duration=10.0, first=True, next_state='failed_distance')
+    def drive_distance(self, initial_call):
+        if initial_call:
+            self.sd = NetworkTable.getTable("SmartDashboard")
+            self.drive.enable_position_prediction()
+        
+        self.x_ctrl.move_to(self.drive_distance_feet)
+        
+        if self.x_ctrl.is_at_location():
+            self.next_state('done')
+            
+    @state
+    def failed_distance(self):
+        self.next_state('done')
+        
+    @state
+    def done(self):
+        self.drive.disable_position_prediction()
         
         
 class GyroTest(StatefulAutonomous):
@@ -83,6 +112,7 @@ class GyroTest(StatefulAutonomous):
         
     @state
     def done(self):
+        self.drive.set_raw_rcw(0.0)
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
         self.drive.disable_position_prediction()
@@ -93,7 +123,7 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     
     drive = swervedrive.SwerveDrive
     y_ctrl = YPosController
-    angle_ctrl = AngleController
+    moving_angle_ctrl = MovingAngleController
     
     drive_distance_feet = tunable(5) #Feet
     align_to = tunable(0) #Deg
@@ -103,10 +133,10 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     def drive_distance(self, initial_call):
         if initial_call:
             self.drive.field_centric = True
-            self.angle_ctrl.reset_angle()
+            self.moving_angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()
         
-        self.angle_ctrl.align_to(self.align_to)
+        self.moving_angle_ctrl.align_to(self.align_to)
         self.y_ctrl.move_to(self.drive_distance_feet)
         
         if self.y_ctrl.is_at_location():
@@ -142,6 +172,7 @@ class AlignAndPlace(StatefulAutonomous):
         
     @state
     def done(self):
+        self.drive.set_raw_rcw(0.0)
         self.drive.disable_position_prediction()
         
     

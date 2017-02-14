@@ -13,7 +13,7 @@ from networktables.networktable import NetworkTable
 
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 from controllers.pos_controller import XPosController, YPosController
-from controllers.angle_controller import AngleController
+from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
 
 class MyRobot(magicbot.MagicRobot):
@@ -27,6 +27,7 @@ class MyRobot(magicbot.MagicRobot):
     y_ctrl = YPosController
     x_ctrl = XPosController
     angle_ctrl = AngleController
+    moving_angle_ctrl = MovingAngleController
     
     pos_history = PositionHistory
 
@@ -49,9 +50,9 @@ class MyRobot(magicbot.MagicRobot):
 
         # Motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.57, inverted = True)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.74)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.03, has_drive_encoder=True, inverted = True)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.56, inverted = True)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.73)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.05, has_drive_encoder=True, inverted = True)
 
 
         # Shooting motors
@@ -131,6 +132,8 @@ class MyRobot(magicbot.MagicRobot):
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
         self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+
+        #print("LeftY: ", self.left_joystick.getY(), " LeftX: ",self.left_joystick.getX(), " RightX: ", self.right_joystick.getX())
 
         # Pivot toggling button on secondary joystick
         if self.pivot_toggle_button.get():

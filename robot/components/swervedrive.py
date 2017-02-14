@@ -220,8 +220,8 @@ class SwerveDrive:
             # degree = 360 * (dist / C)
             # d * (360 / 2 * pi * r) = degree
             
-            fl_y = -math.cos(fl_theta) * fl_dist
-            fl_x = math.sin(fl_theta) * fl_dist
+            fl_y = math.cos(fl_theta) * fl_dist
+            fl_x = -math.sin(fl_theta) * fl_dist
             fl_rcw = -((math.cos((fl_theta + (math.pi/4)) % (2*math.pi)) * fl_dist) / (2*math.pi*radius)) * 360#TODO: Check rotation math
             
             
@@ -230,7 +230,7 @@ class SwerveDrive:
             rr_rcw = -((math.cos((rr_theta + (math.pi/4)) % (2*math.pi)) * rr_dist) / (2*math.pi*radius)) * 360
             
             #raise 'hi'
-            self._predicted_position['fwd'] += (fl_y + rr_y) / 2 #Halved because measured from two drive encoders
+            self._predicted_position['fwd'] += (fl_y + rr_y) / 2#Halved because measured from two drive encoders
             self._predicted_position['strafe'] += (fl_x + rr_x) / 2
             self._predicted_position['rcw'] += (fl_rcw + rr_rcw) #This should be halved but isn't becuase robots are strange 
             
@@ -347,6 +347,8 @@ class SwerveDrive:
         self._requested_vectors['fwd'] = fwd
         self._requested_vectors['strafe'] = strafe
         self._requested_vectors['rcw'] = rcw
+        
+        #print(self._requested_vectors)
         
     def _calculate_vectors(self):
         '''
