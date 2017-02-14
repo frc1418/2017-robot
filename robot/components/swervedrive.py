@@ -110,17 +110,6 @@ class SwerveDrive:
             
             if value:
                 self.navx.reset()
-                
-    @property
-    def wait_for_align(self):
-        return self._wait_for_align
-    
-    @wait_for_align.setter
-    def wait_for_align(self, value):
-        self._wait_for_align = value
-        
-        for module in self.modules.values():
-            module.wait_for_align = value
         
     @staticmethod
     def square_input(input):
@@ -430,8 +419,15 @@ class SwerveDrive:
         
         #print("Requested speeds: %s" % self._requested_speeds)
         
-        for key in self.modules:
-            self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
+        all_aligned = True
+        if self.wait_for_align:
+            for key in self.modules:
+                if not self.modules[key].is_aligned_to(self._requested_angles[key]):
+                    all_aligned = False
+                    break
+        if all_aligned:
+            for key in self.modules:
+                self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
             
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
 
