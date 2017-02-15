@@ -9,26 +9,30 @@ from networktables import NetworkTable
 from magicbot.magic_tunable import tunable
 
 class RightSideGearPlace(StatefulAutonomous):
-    'Placed robot 11in to the right (from the driverstation) of the line'
-    MODE_NAME = "Right_side_gear_place"
+    'Place robot 15in from string 90deg to string'
+    MODE_NAME = "Right side gear place"
     DEFAULT = True
+    
+    DIRECTION = 1
 
     drive = swervedrive.SwerveDrive
     gear_picker = gearpicker.GearPicker
+    
+    
     
     x_ctrl = XPosController
     y_ctrl = YPosController
     angle_ctrl = AngleController
     moving_angle_ctrl = MovingAngleController
     
-    out_distance = tunable(7)
+    out_distance = tunable(7.1)
     rotate_to_angle = tunable(-60)
     wiggle_value = tunable(-5)
     to_gear_distance = tunable(3)
     drive_back_distance = tunable(-3)
     drive_past_line_distance = tunable(5)
 
-    @timed_state(duration = 6, next_state="failed", first = True)
+    @timed_state(duration = 7, next_state="failed", first = True)
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
@@ -44,18 +48,18 @@ class RightSideGearPlace(StatefulAutonomous):
     
     @timed_state(duration = 5, next_state="failed")
     def rotate(self):
-        self.angle_ctrl.align_to(self.rotate_to_angle)
+        self.angle_ctrl.align_to(self.rotate_to_angle * self.DIRECTION)
         
         if self.angle_ctrl.is_aligned():
             self.next_state("drive_to_gear")
             
-    @timed_state(duration=5, next_state='rcw_with_gear')
+    @timed_state(duration = 3, next_state='rcw_with_gear')
     def drive_to_gear(self, initial_call):
         if initial_call:
             self.drive.reset_position_prediction()
             
         self.y_ctrl.move_to(self.to_gear_distance)
-        self.moving_angle_ctrl.align_to(self.rotate_to_angle)
+        self.moving_angle_ctrl.align_to(self.rotate_to_angle * self.DIRECTION)
         
         if self.y_ctrl.is_at_location():
             self.gear_picker._picker_state = 1
@@ -64,7 +68,7 @@ class RightSideGearPlace(StatefulAutonomous):
     @timed_state(duration = 1, next_state = 'try_release')
     def rcw_with_gear(self):
         self.y_ctrl.move_to(self.to_gear_distance)
-        self.drive.set_raw_rcw(0.3)
+        self.drive.set_raw_rcw(0.4 * self.DIRECTION)
         
         if self.y_ctrl.is_at_location():
             self.drive.set_raw_rcw(0.0)
@@ -82,7 +86,7 @@ class RightSideGearPlace(StatefulAutonomous):
             self.drive.reset_position_prediction()
             
         self.y_ctrl.move_to(self.drive_back_distance)
-        self.moving_angle_ctrl.align_to(self.rotate_to_angle)
+        self.moving_angle_ctrl.align_to(self.rotate_to_angle * self.DIRECTION)
         
         if self.y_ctrl.is_at_location():
             self.next_state('rotate_back')
@@ -113,6 +117,13 @@ class RightSideGearPlace(StatefulAutonomous):
     def done(self):
         pass
     
+class LeftSideGearPlace(RightSideGearPlace):
+    'Place robot 15in from string 90deg to string'
+    MODE_NAME = "Left side gear place"
+    DEFAULT = False
+    
+    DIRECTION = -1
+    
 class MiddleGearPlace(StatefulAutonomous):
     MODE_NAME = "Middle Gear Place"
     DEFAULT = False
@@ -130,7 +141,7 @@ class MiddleGearPlace(StatefulAutonomous):
     strafe_distance = tunable(8)
     drive_past_line_distance = tunable(8)
     
-    @timed_state(duration = 4, next_state="failed", first = True)
+    @timed_state(duration = 7, next_state="failed", first = True)
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:

@@ -10,7 +10,7 @@ class XPosController(BasePIDComponent):
     
     drive = swervedrive.SwerveDrive
     
-    kP = tunable(0.09)
+    kP = tunable(0.1)
     kI = tunable(0.0)
     kD = tunable(0.0)
     kF = tunable(0.0)

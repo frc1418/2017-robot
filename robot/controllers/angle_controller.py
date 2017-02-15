@@ -16,13 +16,13 @@ class AngleController(BasePIDComponent):
     
     drive = SwerveDrive
 
-    kP = tunable(0.003)
+    kP = tunable(0.0025)
     kI = tunable(0.0)
     kD = tunable(0.0)
     kF = tunable(0.0)
     
-    kToleranceDegrees = tunable(2)
-    kIzone = tunable(2)
+    kToleranceDegrees = tunable(1)
+    kIzone = tunable(1)
     
     navx = navx.AHRS
     
