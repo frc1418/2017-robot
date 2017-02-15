@@ -12,6 +12,9 @@ from robotpy_ext.common_drivers import navx
 from networktables.networktable import NetworkTable
 
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
+
+from common import pressure_sensor
+
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
@@ -64,6 +67,8 @@ class MyRobot(magicbot.MagicRobot):
         # Pistons for gear picker
         self.picker = wpilib.DoubleSolenoid(6, 7)
         self.pivot = wpilib.DoubleSolenoid(4, 5)
+        
+        self.pessure_sensor = pressure_sensor.REVAnalogPressureSensor(navx.pins.getNavxAnalogInChannel(0))
 
         # Toggling button on secondary joystick
         self.pivot_toggle_button = ButtonDebouncer(self.secondary_joystick, 2)
@@ -177,8 +182,8 @@ class MyRobot(magicbot.MagicRobot):
     def update_sd(self):
         self.sd.putNumber('/climber/motor1_current_draw', self.pdp.getCurrent(1))
         self.sd.putNumber('/climber/motor2_current_draw', self.pdp.getCurrent(2))
-
         
+        self.sd.putNumber('/pnuematics/tank pressure', self.pessure_sensor.getPressure())
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)
