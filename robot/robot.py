@@ -101,8 +101,8 @@ class MyRobot(magicbot.MagicRobot):
 
     def autonomous(self):
         """Prepare for autonomous mode."""
-        #self.drive.allow_reverse = True
-        self.drive.wait_for_align = True
+        self.drive.allow_reverse = False
+        #self.drive.wait_for_align = True
         self.drive.threshold_input_vectors = False
         
         magicbot.MagicRobot.autonomous(self)
@@ -128,6 +128,7 @@ class MyRobot(magicbot.MagicRobot):
         """Do when teleoperated mode is started."""
         self.drive.prepare_for_teleop()
         
+        #self.drive.field_centric = True
         self.drive.allow_reverse = False
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
