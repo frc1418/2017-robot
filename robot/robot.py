@@ -178,6 +178,12 @@ class MyRobot(magicbot.MagicRobot):
             self.drive.xy_multiplier = 1.0
             self.drive.rotation_multiplier = 0.75
             
+        if self.right_joystick.getRawButton(4):
+            self.drive.set_raw_strafe(0.25)
+        
+        if self.right_joystick.getRawButton(5):
+            self.drive.set_raw_strafe(-0.25)
+        
         self.update_sd()
 
     def update_sd(self):
