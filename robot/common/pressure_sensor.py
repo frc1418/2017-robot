@@ -8,4 +8,5 @@ class REVAnalogPressureSensor():
         self.pressure = AnalogInput(channel)
         
     def getPressure(self):
-        return (250*(self.pressure.getVoltage()/self.VOLTAGE_IN))-25
+        v = max(self.pressure.getVoltage(), 0.00001)
+        return (250*(v/self.VOLTAGE_IN))-25
