@@ -209,6 +209,9 @@ class SwerveModule:
         
         self.sd.putNumber("drive/%s/degrees" % self.sd_prefix, self.voltage_to_degrees(self.get_voltage()))
         
+        if self.has_drive_encoder:
+            self.sd.putNumber("drive/%s/raw drive position" % self.sd_prefix, self.driveMotor.getPosition())
+        
         if self.debugging.value:
             self.sd.putNumber("drive/%s/requested_voltage" % self.sd_prefix, self._requested_voltage)
             self.sd.putNumber("drive/%s/requested_speed" % self.sd_prefix, self._requested_speed)
@@ -218,7 +221,6 @@ class SwerveModule:
             self.sd.putNumber("drive/%s/PID" % self.sd_prefix, self._pid_controller.get())
             ##self.sd.putNumber("drive/%s/PID Error" % self.sd_prefix, self._pid_controller.getError())
             
-            if self.has_drive_encoder:
-                self.sd.putNumber("drive/%s/raw drive position" % self.sd_prefix, self.driveMotor.getPosition())
+        
             
             self.sd.putBoolean("drive/%s/allow_reverse" % self.sd_prefix, self.allow_reverse)
