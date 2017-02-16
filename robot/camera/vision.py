@@ -21,17 +21,18 @@ class VictisVision:
         
         #Cameras
         self.piston_cam = cs.UsbCamera("Piston Cam", 1)
-        self.piston_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 160, 120, 10)
+        self.piston_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 20) #160 vs. 120
         self.piston_cam.setExposureManual(35)
+        self.piston_cam.setBrightness(52)
         
         self.light_ring_cam = cs.UsbCamera("Light Ring Cam", 0)
-        self.light_ring_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 10)
+        self.light_ring_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 20)
         
         #Image Processing
         self.cvsink = cs.CvSink("cvsink")
         self.cvsink.setSource(self.light_ring_cam)
         
-        self.cvsource = cs.CvSource("cvsource", cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 10)
+        self.cvsource = cs.CvSource("cvsource", cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 20)
         
         
         #Streaming Servers
