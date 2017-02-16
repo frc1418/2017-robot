@@ -156,9 +156,9 @@ class SwerveModule:
         
     def is_aligned_to(self, deg):
         deg = deg % 360
-        voltage = ((self.degree_to_voltage(value)+self.encoder_zero) % 5)
+        voltage = ((self.degree_to_voltage(deg)+self.encoder_zero) % 5)
         
-        if abs(voltage - self.get_voltage()) < 0.05:
+        if abs(voltage - self.get_voltage()) < 0.1:
             return True
         return False
 
