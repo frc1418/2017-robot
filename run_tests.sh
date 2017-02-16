@@ -12,4 +12,4 @@ rc=$?; if [[ $rc != 0 ]]; then kill -s TERM $TOP_PID; fi;
 }
 export -f print
 
-find ./robot -name \*.py -exec bash -c 'print "$0"' {} \;
+#find ./robot -name \*.py -exec bash -c 'print "$0"' {} \;
