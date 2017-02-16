@@ -187,8 +187,10 @@ class MyRobot(magicbot.MagicRobot):
         self.update_sd()
 
     def update_sd(self):
-        self.sd.putNumber('/climber/motor1_current_draw', self.pdp.getCurrent(1))
-        self.sd.putNumber('/climber/motor2_current_draw', self.pdp.getCurrent(2))
+        self.sd.putNumber('/current/climb1_current_draw', self.pdp.getCurrent(1))
+        self.sd.putNumber('/current/climb2_current_draw', self.pdp.getCurrent(2))
+        self.sd.putNumber('/current/rr_rotate_current_draw', self.pdp.getCurrent(8))
+        self.sd.putNumber('/current/fl_rotate_current_draw', self.pdp.getCurrent(7))
         
         self.sd.putNumber('/pnuematics/tank pressure', self.pessure_sensor.getPressure())
 
