@@ -128,7 +128,7 @@ class MyRobot(magicbot.MagicRobot):
         """Do when teleoperated mode is started."""
         self.drive.prepare_for_teleop()
         
-        #self.drive.field_centric = True
+        self.drive._field_centric = True
         self.drive.allow_reverse = False
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
