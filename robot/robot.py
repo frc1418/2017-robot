@@ -45,18 +45,22 @@ class MyRobot(magicbot.MagicRobot):
         # Joysticks
         self.left_joystick = wpilib.Joystick(0)
         self.right_joystick = wpilib.Joystick(1)
+        
         self.secondary_joystick = wpilib.Joystick(2)
 
         # Triggers and buttons
         self.right_trigger = ButtonDebouncer(self.right_joystick, 1)
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
-        # Motors
+        # Drive motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93, has_drive_encoder=True)
         self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.56, inverted = True)
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=3.73)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.05, has_drive_encoder=True, inverted = True)
 
+        # Drive control
+        self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
+        self.predict_position = ButtonDebouncer(self.left_joystick, 7)
 
         # Shooting motors
         self.shooter_motor = ctre.CANTalon(15)
@@ -73,7 +77,6 @@ class MyRobot(magicbot.MagicRobot):
         # Toggling button on secondary joystick
         self.pivot_toggle_button = ButtonDebouncer(self.secondary_joystick, 2)
 
-
         # Or, up and down buttons on right joystick
         self.pivot_down_button = ButtonDebouncer(self.right_joystick, 2)
         self.pivot_up_button = ButtonDebouncer(self.right_joystick, 3)
@@ -85,13 +88,11 @@ class MyRobot(magicbot.MagicRobot):
         self.climb_motor1 = wpilib.spark.Spark(4)
         self.climb_motor2 = wpilib.spark.Spark(5)
 
-        # Drive control
-        self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
-        self.predict_position = ButtonDebouncer(self.left_joystick, 7)
-
+        # Camera gimble
         self.gimbal_yaw = wpilib.Servo(6)
         self.gimbal_pitch = wpilib.Servo(7)
 
+        # PDP
         self.pdp = wpilib.PowerDistributionPanel(0)
 
     def robotInit(self):
@@ -114,10 +115,6 @@ class MyRobot(magicbot.MagicRobot):
         Usually emptied.
         Sometimes used to easily test sensors and other things.
         """
-        self.rr_module.update_smartdash()
-        self.rl_module.update_smartdash()
-        self.fr_module.update_smartdash()
-        self.fl_module.update_smartdash()
         self.update_sd()
 
 
@@ -126,9 +123,9 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
-        self.drive.prepare_for_teleop()
+        self.drive.prepare_for_teleop() #This is a poor solution to the drive system maintain speed/direction
         
-        self.drive._field_centric = True
+        self.drive._field_centric = True # Doesn't set the property becuase the property resets the navx
         self.drive.allow_reverse = False
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
@@ -137,39 +134,12 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
+        
+        #Drive system
         self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
 
-        #print("LeftY: ", self.left_joystick.getY(), " LeftX: ",self.left_joystick.getX(), " RightX: ", self.right_joystick.getX())
-
-        # Pivot toggling button on secondary joystick
-        if self.pivot_toggle_button.get():
-            if self.gear_picker._pivot_state == 1:
-                self.gear_picker.pivot_down()
-            else:
-                self.gear_picker.pivot_up()
-
-        # Or, up/down buttons on right joystick for primary driver control.
-        if self.pivot_up_button.get():
-            self.gear_picker.pivot_up()
-        elif self.pivot_down_button.get():
-            self.gear_picker.pivot_down()
-
-        if self.right_trigger.get() or self.secondary_trigger.get():
-            self.gear_picker.actuate_picker()
-
-        if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
-            self.climber.climb()
-
-        if self.left_joystick.getRawButton(1) or self.secondary_joystick.getRawButton(3):
-            self.shooter.shoot()
-        else:
-            self.shooter.stop()
-            
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
-
-        if self.accumulator_button2.get() or self.accumulator_button.get():
-            self.gear_picker.intake_on = not self.gear_picker.intake_on
             
         if self.left_joystick.getRawButton(2):
             self.drive.xy_multiplier = 0.5
@@ -183,7 +153,36 @@ class MyRobot(magicbot.MagicRobot):
         
         if self.right_joystick.getRawButton(5):
             self.drive.set_raw_strafe(-0.25)
-        
+
+        # Gear picker
+        if self.pivot_toggle_button.get():
+            if self.gear_picker._pivot_state == 1:
+                self.gear_picker.pivot_down()
+            else:
+                self.gear_picker.pivot_up()
+                        
+        if self.pivot_up_button.get():
+            self.gear_picker.pivot_up()
+        elif self.pivot_down_button.get():
+            self.gear_picker.pivot_down()
+
+        if self.right_trigger.get() or self.secondary_trigger.get():
+            self.gear_picker.actuate_picker()
+
+        # Climber
+        if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
+            self.climber.climb()
+            
+        # Shooter
+        if self.left_joystick.getRawButton(1) or self.secondary_joystick.getRawButton(3):
+            self.shooter.shoot()
+        else:
+            self.shooter.stop()
+            
+        # Accumulator
+        if self.accumulator_button2.get() or self.accumulator_button.get():
+            self.gear_picker.intake_on = not self.gear_picker.intake_on
+            
         self.update_sd()
 
     def update_sd(self):
@@ -193,6 +192,8 @@ class MyRobot(magicbot.MagicRobot):
         self.sd.putNumber('/current/fl_rotate_current_draw', self.pdp.getCurrent(7))
         
         self.sd.putNumber('/pnuematics/tank pressure', self.pessure_sensor.getPressure())
+        
+        self.drive.update_smartdash()
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)
