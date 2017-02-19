@@ -199,7 +199,7 @@ class SwerveModule:
 
         Should be called every robot iteration/loop.
         '''
-        
+        #print(self.sd_prefix, " Speed: ", self._requested_speed, " Voltage: ", self._requested_voltage)
         self._pid_controller.setSetpoint(self._requested_voltage)
         self.driveMotor.set(self._requested_speed)
         
