@@ -92,7 +92,7 @@ class AngleController(BasePIDComponent):
             if self.is_aligned():
                 self.drive.set_raw_rcw(0)
             else:
-                print('Setting rotation: %s' % self.rate)
+                #print('Setting rotation: %s' % self.rate)
                 self.drive.set_raw_rcw(self.rate)
                 
 class MovingAngleController(AngleController):

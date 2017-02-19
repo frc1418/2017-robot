@@ -84,7 +84,7 @@ class BasePIDComponent:
             #Scale to min and max output
             scaled_output = ((abs(output) - self.MIN_ABS_OUTPUT) / (self.MAX_ABS_OUTPUT - self.MIN_ABS_OUTPUT) * (self._abs_max - self._abs_min)) + self._abs_min
             output = math.copysign(scaled_output, output)
-            print("Output: ", output, "Error: ", err, " P: ", self.kP," I: ", self.kI, " D: ", self.kD)
+            #print("Output: ", output, "Error: ", err, " P: ", self.kP," I: ", self.kI, " D: ", self.kD)
             
             self._last_output = output
             self._last_err = err
