@@ -13,7 +13,7 @@ from networktables.networktable import NetworkTable
 
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 
-from common import pressure_sensor
+from common import pressure_sensor, scale
 
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
@@ -182,6 +182,13 @@ class MyRobot(magicbot.MagicRobot):
         # Accumulator
         if self.accumulator_button2.get() or self.accumulator_button.get():
             self.gear_picker.intake_on = not self.gear_picker.intake_on
+            
+        # Secondary driver gimble control
+        
+        if self.secondary_joystick.getRawButton(12):
+            #(input, input_min, input_max, output_min, output_max)
+            self.gimbal.yaw = scale.scale(self.secondary_joystick.getX()*-1, -1, 1, 0, 0.14)
+            self.gimbal.pitch = scale.scale(self.secondary_joystick.getY()*-1, -1, 1, 0.18, 0.72)
             
         self.update_sd()
 
