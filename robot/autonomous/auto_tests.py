@@ -96,7 +96,7 @@ class GyroTest(StatefulAutonomous):
             self.angle_ctrl.reset_angle()
             
             self.drive.allow_reverse = True
-            self.drive.wait_for_align = True
+            #self.drive.wait_for_align = True
             
             self.drive.threshold_input_vectors = False
             

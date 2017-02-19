@@ -1,5 +1,9 @@
 from robotpy_ext.autonomous import state, timed_state, StatefulAutonomous
-from components import swervedrive, gearpicker
+
+from .base_auto import VictisAuto
+
+from components import swervedrive, gearpicker, shooter
+
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
@@ -8,7 +12,7 @@ import wpilib
 from networktables import NetworkTable
 from magicbot.magic_tunable import tunable
 
-class RightSideGearPlace(StatefulAutonomous):
+class RightSideGearPlace(VictisAuto):
     'Place robot 15in from string 90deg to string'
     MODE_NAME = "Right side gear place"
     DEFAULT = True
@@ -25,11 +29,11 @@ class RightSideGearPlace(StatefulAutonomous):
     angle_ctrl = AngleController
     moving_angle_ctrl = MovingAngleController
     
-    out_distance = tunable(7.1)
+    out_distance = tunable(7.5)
     rotate_to_angle = tunable(-60)
     wiggle_value = tunable(-5)
-    to_gear_distance = tunable(3)
-    drive_back_distance = tunable(-3)
+    to_gear_distance = tunable(2.5)
+    drive_back_distance = tunable(-2.7)
     drive_past_line_distance = tunable(5)
 
     @timed_state(duration = 7, next_state="failed", first = True)
@@ -77,6 +81,7 @@ class RightSideGearPlace(StatefulAutonomous):
     
     @state
     def try_release(self):
+        self.drive.debug()
         self.gear_picker._picker_state = 1
         self.next_state('drive_back')
             
@@ -93,6 +98,7 @@ class RightSideGearPlace(StatefulAutonomous):
     
     @state
     def rotate_back(self):
+        '''IF MODIFIED: Function in ShootLeftGearPlace must be modified too'''
         self.angle_ctrl.align_to(0)
         
         if self.angle_ctrl.is_aligned():
@@ -108,14 +114,6 @@ class RightSideGearPlace(StatefulAutonomous):
             
         if self.y_ctrl.is_at_location():
             self.next_state('done')
-
-    @state
-    def failed(self):
-        self.next_state("done")
-    
-    @state
-    def done(self):
-        pass
     
 class LeftSideGearPlace(RightSideGearPlace):
     'Place robot 15in from string 90deg to string'
@@ -123,8 +121,39 @@ class LeftSideGearPlace(RightSideGearPlace):
     DEFAULT = False
     
     DIRECTION = -1
+
+class ShootLeftSideGearPlace(RightSideGearPlace):
+    'Place robot 15in from string 90deg to string'
+    MODE_NAME = "Shoot left side gear place"
+    DEFAULT = False
     
-class MiddleGearPlace(StatefulAutonomous):
+    DIRECTION = -1
+    
+    drive_back_distance = tunable(-3)
+    at_tower_angle = tunable(40)
+    
+    shooter = shooter.Shooter
+    x_ctrl = XPosController
+    
+    @state
+    def rotate_back(self):
+        '''IF MODIFIED: Function in RightGearPlace must be modified too'''
+        self.angle_ctrl.align_to(self.at_tower_angle)
+        
+        if self.angle_ctrl.is_aligned():
+            self.drive.set_raw_rcw(0.0)
+            self.next_state('sit_and_shoot')
+            self.shooter.shoot()
+            
+    @timed_state(duration = 8, next_state = 'done')
+    def sit_and_shoot(self):
+        self.shooter.shoot()
+        
+    @state
+    def done(self):
+        self.shooter.stop()
+        
+class MiddleGearPlace(VictisAuto):
     MODE_NAME = "Middle Gear Place"
     DEFAULT = False
     
@@ -137,7 +166,7 @@ class MiddleGearPlace(StatefulAutonomous):
     moving_angle_ctrl = MovingAngleController
     
     out_distance = tunable(6)
-    drive_back_distance = tunable(-3)
+    #drive_back_distance = tunable(-3)
     strafe_distance = tunable(8)
     drive_past_line_distance = tunable(8)
     
@@ -165,7 +194,9 @@ class MiddleGearPlace(StatefulAutonomous):
         self.moving_angle_ctrl.align_to(0)
         
         if self.y_ctrl.is_at_location():
-            self.next_state('rotate_back')
+            self.next_state('done')
+            
+    '''
     
     @timed_state(duration = 6, next_state='failed')
     def strafe_distance(self, initial_call):
@@ -189,10 +220,59 @@ class MiddleGearPlace(StatefulAutonomous):
         if self.y_ctrl.is_at_location():
             self.next_state('done')
     
-    @state
-    def failed(self):
-        self.next_state("done")
+    '''
     
-    @state
-    def done(self):
-        pass
+class ShootMiddleGearPlace(MiddleGearPlace):
+    MODE_NAME = "Shoot middle Gear Place"
+    DEFAULT = False
+    
+    drive = swervedrive.SwerveDrive
+    gear_picker = gearpicker.GearPicker
+    shooter = shooter.Shooter
+    
+    x_ctrl = XPosController
+    y_ctrl = YPosController
+    angle_ctrl = AngleController
+    moving_angle_ctrl = MovingAngleController
+    
+    drive_back_distance = tunable(-3)
+    strafe_tower_distance = tunable(-5)
+    at_tower_angle = tunable(60)
+            
+    @timed_state(duration = 5, next_state='failed')
+    def drive_back(self, initial_call):
+        if initial_call:
+            self.drive.reset_position_prediction()
+            
+        self.y_ctrl.move_to(self.drive_back_distance)
+        self.moving_angle_ctrl.align_to(0)
+        
+        if self.y_ctrl.is_at_location():
+            self.next_state('strafe_tower')
+            
+    @timed_state(duration = 6, next_state='failed')     
+    def strafe_tower(self, initial_call):
+        if initial_call:
+            self.drive.reset_position_prediction()
+            
+        self.x_ctrl.move_to(self.strafe_tower_distance)
+        self.moving_angle_ctrl.align_to(0)
+        
+        if self.x_ctrl.is_at_location():
+            self.next_state('align_to_tower')
+            
+    @timed_state(duration = 5, next_state='failed')
+    def align_to_tower(self):
+        self.angle_ctrl.align_to(self.at_tower_angle)
+        
+        if self.angle_ctrl.is_aligned():
+            self.drive.set_raw_rcw(0.0)
+            self.next_state('sit_and_shoot')
+            self.shooter.shoot()
+            
+    @timed_state(duration = 8, next_state = 'done')
+    def sit_and_shoot(self):
+        self.drive.debug(debug_modules=True)
+        self.shooter.shoot()
+    
+        
