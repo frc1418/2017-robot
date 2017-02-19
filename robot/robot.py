@@ -193,12 +193,12 @@ class MyRobot(magicbot.MagicRobot):
         self.update_sd()
 
     def update_sd(self):
-        self.sd.putNumber('/current/climb1_current_draw', self.pdp.getCurrent(1))
-        self.sd.putNumber('/current/climb2_current_draw', self.pdp.getCurrent(2))
-        self.sd.putNumber('/current/rr_rotate_current_draw', self.pdp.getCurrent(8))
-        self.sd.putNumber('/current/fl_rotate_current_draw', self.pdp.getCurrent(7))
+        self.sd.putNumber('current/climb1_current_draw', self.pdp.getCurrent(1))
+        self.sd.putNumber('current/climb2_current_draw', self.pdp.getCurrent(2))
+        self.sd.putNumber('current/rr_rotate_current_draw', self.pdp.getCurrent(8))
+        self.sd.putNumber('current/fl_rotate_current_draw', self.pdp.getCurrent(7))
         
-        self.sd.putNumber('/pnuematics/tank pressure', self.pessure_sensor.getPressure())
+        self.sd.putNumber('pneumatics/tank_pressure', self.pessure_sensor.getPressure())
         
         self.drive.update_smartdash()
 
