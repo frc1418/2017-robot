@@ -7,7 +7,7 @@ class Shooter(StateMachine):
     belt_motor = wpilib.spark.Spark
     shooter_motor = ctre.CANTalon
     
-    shooter_speed = tunable(-1)
+    shooter_speed = tunable(-0.9)
         
     def stop(self):
         self.shooter_motor.set(0)
