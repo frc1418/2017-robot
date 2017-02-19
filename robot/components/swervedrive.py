@@ -15,7 +15,7 @@ class SwerveDrive:
     navx = navx.AHRS
     
     snap_rotation_axes = ntproperty('/SmartDashboard/drive/drive/snap_rotation_axes', 8)
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
+    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.06)
     
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 1)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 1)
@@ -395,11 +395,23 @@ class SwerveDrive:
         
         #print(self._requested_vectors)
         
-        '''
+        
         #Zero request vectors for saftey reasons
         self._requested_vectors['fwd'] = 0.0
         self._requested_vectors['strafe'] = 0.0
-        self._requested_vectors['rcw'] = 0.0'''
+        self._requested_vectors['rcw'] = 0.0
+        
+    def debug(self, debug_modules = False):
+        if self.predict_position:
+            print("Poistion: ", self._predicted_position, "\n")
+        
+        if debug_modules:
+            for key in self.modules:
+                self.modules[key].debug()
+        
+        print("Requested values: ", self._requested_vectors, "\n")
+        print("Requested angles: ", self._requested_angles, "\n")
+        print("Requested speeds: ", self._requested_speeds, "\n")
 
     def execute(self):
         '''

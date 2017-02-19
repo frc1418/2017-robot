@@ -188,6 +188,9 @@ class SwerveModule:
                 
         self._requested_speed = speed
         self._set_deg(deg)
+    
+    def debug(self):
+        print(self.sd_prefix, "; requested_speed: ", self._requested_speed, " requested_voltage: ", self._requested_voltage)
 
     def execute(self):
         '''
@@ -199,6 +202,9 @@ class SwerveModule:
         
         self._pid_controller.setSetpoint(self._requested_voltage)
         self.driveMotor.set(self._requested_speed)
+        
+        self._requested_speed = 0.0
+            
             
         self.update_smartdash()
 
