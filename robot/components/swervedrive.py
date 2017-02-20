@@ -434,7 +434,7 @@ class SwerveDrive:
         all_aligned = True
         if self.wait_for_align:
             for key in self.modules:
-                if not self.modules[key].is_aligned_to(self._requested_angles[key]):
+                if not self.modules[key].is_aligned():
                     all_aligned = False
                     break
         
@@ -443,6 +443,10 @@ class SwerveDrive:
             
             for key in self.modules:
                 self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
+                
+        elif not all_aligned and self.wait_for_align:
+            for key in self.modules:
+                self.modules[key].move(0, self._requested_angles[key])
             
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
 

@@ -65,6 +65,9 @@ class SwerveModule:
         self.has_drive_encoder = kwargs.pop("has_drive_encoder", False)
         self.drive_encoder_zero = 0
 
+    def set_pid(self, p, i, d):
+        self._pid_controller.setPID(p, i, d)
+    
     def get_voltage(self):
         return self.encoder.getVoltage() - self.encoder_zero
     
@@ -154,12 +157,10 @@ class SwerveModule:
 
         self.encoder_zero = self.encoder.getVoltage()
         
-    def is_aligned_to(self, deg):
-        deg = deg % 360
-        voltage = ((self.degree_to_voltage(deg)+self.encoder_zero) % 5)
-        
-        if abs(voltage - self.get_voltage()) < 0.1:
+    def is_aligned(self):
+        if abs(self._pid_controller.getError()) < 0.1:
             return True
+        print(self.sd_prefix, "Voltage Error", abs(self._pid_controller.getError()))
         return False
 
     def _set_deg(self, value):

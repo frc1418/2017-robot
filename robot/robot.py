@@ -103,8 +103,8 @@ class MyRobot(magicbot.MagicRobot):
     def autonomous(self):
         """Prepare for autonomous mode."""
         self.drive.allow_reverse = False
-        #self.drive.wait_for_align = True
-        self.drive.threshold_input_vectors = False
+        self.drive.wait_for_align = True
+        self.drive.threshold_input_vectors = True
         
         magicbot.MagicRobot.autonomous(self)
 
