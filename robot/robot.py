@@ -104,7 +104,7 @@ class MyRobot(magicbot.MagicRobot):
         self.drive.wait_for_align = True
         self.drive.threshold_input_vectors = True
         
-        magicbot.MagicRobot.autonomous(self)
+        super().autonomous()
 
     def disabledPeriodic(self):
         """
