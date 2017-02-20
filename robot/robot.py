@@ -82,9 +82,6 @@ class MyRobot(magicbot.MagicRobot):
         self.pivot_down_button = ButtonDebouncer(self.right_joystick, 2)
         self.pivot_up_button = ButtonDebouncer(self.right_joystick, 3)
 
-        self.accumulator_button = ButtonDebouncer(self.secondary_joystick, 5)
-        self.accumulator_button2 = ButtonDebouncer(self.left_joystick, 8)
-
         # Climb motors
         self.climb_motor1 = wpilib.spark.Spark(4)
         self.climb_motor2 = wpilib.spark.Spark(5)
@@ -179,10 +176,6 @@ class MyRobot(magicbot.MagicRobot):
             self.shooter.shoot()
         else:
             self.shooter.stop()
-            
-        # Accumulator
-        if self.accumulator_button2.get() or self.accumulator_button.get():
-            self.gear_picker.intake_on = not self.gear_picker.intake_on
             
         # Secondary driver gimble control
         
