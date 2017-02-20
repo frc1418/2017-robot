@@ -9,7 +9,7 @@ from components.swervedrive import SwerveDrive
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController
 
-class AutoPlace(StateMachine):
+class AutoAlign(StateMachine):
     drive = SwerveDrive
     
     x_ctrl = XPosController
@@ -18,7 +18,7 @@ class AutoPlace(StateMachine):
     
     pos_history = PositionHistory
     
-    camera_enabled = ntproperty('/camera/enabled', False)
+    cv_enabled = ntproperty('/camera/control/cv_enabled', False)
     
     ideal_skew = tunable(-0.967)
     ideal_angle = tunable(-1.804)
@@ -49,5 +49,42 @@ class AutoPlace(StateMachine):
                 r_angle, r_x, r_y, r_time = history 
                 
                 self.aimed_at_angle = r_angle + angle - self.ideal_angle
-                self.aimed_at_x = r_angle
+                
+            self.target = None
+            
+        if self.aimed_at_angle is not None:
+            self.angle_ctrl.align_to(self.aimed_at_angle)
+        
+        return self.angle_ctrl.is_aligned()
     
+    def align(self):
+        self.engage()
+        
+    @state(first = True)
+    def inital_state(self):
+        
+        self.target = None
+        self.aimed_at_angle = None
+        
+        self.pos_history.enable()
+        
+        self.cv_enabled = True
+        
+        self.next_state('moving_to_position')
+        
+    @state
+    def moving_to_position(self):
+        
+        if self._move_to_position():
+            self.next_state('done')
+            
+    @state
+    def end(self):
+        pass
+    
+    def done(self):
+        super().done()
+        
+        self.pos_history.disable()
+        
+        self.cv_enabled = False
