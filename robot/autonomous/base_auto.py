@@ -8,7 +8,7 @@ class VictisAuto(StatefulAutonomous):
     
     @state
     def failed(self):
-        self.drive.debug()
+        self.drive.debug(debug_modules = True)
         self.next_state('done')
         
     @state

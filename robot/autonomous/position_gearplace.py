@@ -170,7 +170,7 @@ class MiddleGearPlace(VictisAuto):
     strafe_distance = tunable(8)
     drive_past_line_distance = tunable(8)
     
-    @timed_state(duration = 7, next_state="failed", first = True)
+    @timed_state(duration = 4, next_state="rcw_with_gear", first = True)
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
@@ -184,6 +184,22 @@ class MiddleGearPlace(VictisAuto):
         if self.y_ctrl.is_at_location():
             self.gear_picker._picker_state = 1
             self.next_state("drive_back")
+            
+    @timed_state(duration = 1, next_state = 'try_release')
+    def rcw_with_gear(self):
+        self.y_ctrl.move_to(self.out_distance)
+        self.drive.set_raw_rcw(0.4)
+        
+        if self.y_ctrl.is_at_location():
+            self.drive.set_raw_rcw(0.0)
+            self.gear_picker._picker_state = 1
+            self.next_state('drive_back')
+    
+    @state
+    def try_release(self):
+        self.drive.debug()
+        self.gear_picker._picker_state = 1
+        self.next_state('drive_back')
             
     @timed_state(duration = 5, next_state='failed')
     def drive_back(self, initial_call):
@@ -236,8 +252,8 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     moving_angle_ctrl = MovingAngleController
     
     drive_back_distance = tunable(-3)
-    strafe_tower_distance = tunable(-5)
-    at_tower_angle = tunable(60)
+    strafe_tower_distance = tunable(-3.75)
+    at_tower_angle = tunable(55)
             
     @timed_state(duration = 5, next_state='failed')
     def drive_back(self, initial_call):
@@ -254,9 +270,11 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     def strafe_tower(self, initial_call):
         if initial_call:
             self.drive.reset_position_prediction()
-            
+        
+        
         self.x_ctrl.move_to(self.strafe_tower_distance)
         self.moving_angle_ctrl.align_to(0)
+        self.shooter.force_spin()
         
         if self.x_ctrl.is_at_location():
             self.next_state('align_to_tower')
@@ -264,15 +282,18 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     @timed_state(duration = 5, next_state='failed')
     def align_to_tower(self):
         self.angle_ctrl.align_to(self.at_tower_angle)
+        self.shooter.force_spin()
         
         if self.angle_ctrl.is_aligned():
             self.drive.set_raw_rcw(0.0)
             self.next_state('sit_and_shoot')
-            self.shooter.shoot()
+            self.shooter.force_spin()
             
     @timed_state(duration = 8, next_state = 'done')
     def sit_and_shoot(self):
+        
         self.drive.debug(debug_modules=True)
-        self.shooter.shoot()
+        self.shooter.force_spin()
+        self.shooter.force_feed()
     
         
