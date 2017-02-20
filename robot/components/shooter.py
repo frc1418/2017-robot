@@ -17,6 +17,12 @@ class Shooter(StateMachine):
     
     def shoot(self):
         self.engage()
+        
+    def force_spin(self):
+        self.shooter_motor.set(self.shooter_speed)
+    
+    def force_feed(self):
+        self.belt_motor.set(-1)
     
     @timed_state(duration=1.0, first=True, next_state='feed_shoot')
     def spinup(self):
