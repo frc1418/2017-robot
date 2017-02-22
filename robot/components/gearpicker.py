@@ -37,18 +37,12 @@ class GearPicker:
         """Pivot picker arm up."""
         self._pivot_state = 1
         
-        self.gimbal.yaw = 0.0
-        self.gimbal.pitch = 0.4
-        
         if self.intake_on:
             self.intake_motor.set(1)
 
     def pivot_down(self):
         """Pivot picker arm down."""
         self._pivot_state = 2
-        
-        self.gimbal.yaw = 0.15
-        self.gimbal.pitch = 0.7
         
         self.intake_motor.set(0)
 

@@ -2,14 +2,13 @@ import wpilib
 from networktables.networktable import NetworkTable
 from networktables.util import ntproperty
 
-
 class Gimbal:
     # Yaw = left/right, pitch = up/down
     gimbal_yaw = wpilib.Servo
     gimbal_pitch = wpilib.Servo
 
     yaw = ntproperty('/camera/gimbal/yaw', 0)
-    pitch = ntproperty('/camera/gimbal/pitch', 0)
+    pitch = ntproperty('/camera/gimbal/pitch', 0.52)
 
     def setup(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
