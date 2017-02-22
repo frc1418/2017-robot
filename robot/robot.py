@@ -18,6 +18,7 @@ from common import pressure_sensor, scale
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
+from controllers.auto_align import AutoAlign
 
 class MyRobot(magicbot.MagicRobot):
 
@@ -33,7 +34,8 @@ class MyRobot(magicbot.MagicRobot):
     moving_angle_ctrl = MovingAngleController
     
     pos_history = PositionHistory
-
+    auto_align = AutoAlign
+    
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
         # NavX
@@ -54,7 +56,6 @@ class MyRobot(magicbot.MagicRobot):
 
         # Drive motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93, has_drive_encoder=True)
-        #self.rr_module.set_pid(p, i, d)
         self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.59, inverted = True)
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.6)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.04, has_drive_encoder=True, inverted = True)
@@ -178,11 +179,16 @@ class MyRobot(magicbot.MagicRobot):
             self.shooter.stop()
             
         # Secondary driver gimble control
-        
         if self.secondary_joystick.getRawButton(12):
             #(input, input_min, input_max, output_min, output_max)
             self.gimbal.yaw = scale.scale(self.secondary_joystick.getX()*-1, -1, 1, 0, 0.14)
             self.gimbal.pitch = scale.scale(self.secondary_joystick.getY()*-1, -1, 1, 0.18, 0.72)
+            
+        # Auto align test
+        if self.right_joystick.getRawButton(10):
+            self.auto_align.align()
+        else:
+            self.auto_align.done()
             
         self.update_sd()
 
