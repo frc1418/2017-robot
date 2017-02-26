@@ -18,6 +18,7 @@ class DriveTest(StatefulAutonomous):
     def drive_test(self, initial_call):
         # Go forward
         if initial_call:
+            self.drive._field_centric = False
             self.drive.enable_position_prediction()
         self.drive.set_raw_fwd(0.5)
         
@@ -34,6 +35,7 @@ class DriveStraightTest(StatefulAutonomous):
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
     def drive_distance(self, initial_call):
         if initial_call:
+            self.drive._field_centric = False
             self.sd = NetworkTable.getTable("SmartDashboard")
             self.drive.enable_position_prediction()
         
@@ -64,6 +66,7 @@ class DriveLeftTest(StatefulAutonomous):
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
     def drive_distance(self, initial_call):
         if initial_call:
+            self.drive._field_centric = False
             self.sd = NetworkTable.getTable("SmartDashboard")
             self.drive.enable_position_prediction()
         
@@ -126,13 +129,13 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     moving_angle_ctrl = MovingAngleController
     
     drive_distance_feet = tunable(5) #Feet
-    align_to = tunable(0) #Deg
+    align_to = tunable(180) #Deg
         
     
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
     def drive_distance(self, initial_call):
         if initial_call:
-            self.drive.field_centric = True
+            self.drive._field_centric = True
             self.moving_angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()
         
@@ -163,6 +166,7 @@ class AlignAndPlace(StatefulAutonomous):
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
     def drive_distance(self, initial_call):
         if initial_call:
+            self.drive._field_centric = False
             self.drive.enable_position_prediction()
             self.pos_history.enable()
             
