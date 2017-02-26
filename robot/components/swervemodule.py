@@ -69,7 +69,7 @@ class SwerveModule:
         self._pid_controller.setPID(p, i, d)
     
     def get_voltage(self):
-        return self.encoder.getVoltage() - self.encoder_zero
+        return self.encoder.getAverageVoltage() - self.encoder_zero
     
     def get_drive_encoder_tick(self):
         if not self.has_drive_encoder:
@@ -224,10 +224,11 @@ class SwerveModule:
             self.sd.putNumber("drive/%s/requested_voltage" % self.sd_prefix, self._requested_voltage)
             self.sd.putNumber("drive/%s/requested_speed" % self.sd_prefix, self._requested_speed)
             self.sd.putNumber("drive/%s/raw voltage" % self.sd_prefix, self.encoder.getVoltage()) # DO NOT USE self.get_voltage() here
+            self.sd.putNumber("drive/%s/average voltage" % self.sd_prefix, self.encoder.getAverageVoltage())
             self.sd.putNumber("drive/%s/encoder_zero" % self.sd_prefix, self.encoder_zero)
     
             self.sd.putNumber("drive/%s/PID" % self.sd_prefix, self._pid_controller.get())
-            ##self.sd.putNumber("drive/%s/PID Error" % self.sd_prefix, self._pid_controller.getError())
+            self.sd.putNumber("drive/%s/PID Error" % self.sd_prefix, self._pid_controller.getError())
             
         
             
