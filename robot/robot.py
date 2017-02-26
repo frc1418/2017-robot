@@ -19,6 +19,7 @@ from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
 from controllers.auto_align import AutoAlign
+from magicbot.magic_tunable import tunable
 
 class MyRobot(magicbot.MagicRobot):
 
@@ -35,6 +36,8 @@ class MyRobot(magicbot.MagicRobot):
     
     pos_history = PositionHistory
     auto_align = AutoAlign
+    
+    gamepad_mode = tunable(False)
     
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
@@ -135,7 +138,10 @@ class MyRobot(magicbot.MagicRobot):
         """Do periodically while robot is in teleoperated mode."""
         
         #Drive system
-        self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+        if not self.gamepad_mode or self.ds.isFMSAttached():
+            self.drive.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+        else:
+            self.drive.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0)*-1, self.left_joystick.getRawAxis(2)*-1)
 
         if self.field_centric_button.get():
             self.drive.field_centric = not self.drive.field_centric
