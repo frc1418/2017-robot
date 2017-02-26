@@ -38,7 +38,7 @@ class RightSideGearPlace(VictisAuto):
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
-            self.drive._field_centric = False
+            self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()
@@ -178,7 +178,7 @@ class MiddleGearPlace(VictisAuto):
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
-            self.drive._field_centric = False
+            self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()

@@ -96,20 +96,6 @@ class SwerveDrive:
         
         for module in self.modules.values():
             module.allow_reverse = value
-    
-    @property
-    def field_centric(self):
-        return self._field_centric
-    
-    @field_centric.setter
-    def field_centric(self, value):
-        if self.navx is None:
-            self._field_centric = False
-        else:
-            self._field_centric = value
-            
-            if value:
-                self.navx.reset()
         
     @staticmethod
     def square_input(input):
