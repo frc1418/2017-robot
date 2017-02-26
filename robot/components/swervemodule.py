@@ -41,7 +41,8 @@ class SwerveModule:
 
         # Motors
         self.driveMotor = args[0]
-        self.driveMotor.setInverted(kwargs.pop("inverted", False))
+        self.drive_inverted = kwargs.pop("inverted", False)
+        self.driveMotor.setInverted(self.drive_inverted)
         
         self.rotateMotor = args[1]
         
