@@ -13,5 +13,6 @@ class VictisAuto(StatefulAutonomous):
         
     @state
     def done(self):
-        self.drive.prepare_for_teleop()
+        self.drive.flush()
+        super().done()
         

@@ -122,10 +122,11 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledInit(self):
         """Do once right away when robot is disabled."""
+        self.drive.flush()
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
-        self.drive.prepare_for_teleop() #This is a poor solution to the drive system maintain speed/direction
+        self.drive.flush() #This is a poor solution to the drive system maintain speed/direction
         
         self.drive._field_centric = True # Doesn't set the property becuase the property resets the navx
         self.drive.allow_reverse = False
