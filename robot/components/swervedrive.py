@@ -132,7 +132,7 @@ class SwerveDrive:
                 data[key] = data[key] / maxMagnitude
         return data
     
-    def prepare_for_teleop(self):
+    def flush(self):
         self._requested_vectors = {
                 'fwd': 0,
                 'strafe': 0,
@@ -154,7 +154,7 @@ class SwerveDrive:
         }
         
         for module in self.modules.values():
-            module.prepare_for_teleop()
+            module.flush()
         
     
     def enable_position_prediction(self, zero_position = True):
@@ -431,6 +431,7 @@ class SwerveDrive:
         
         #print("Requested speeds: %s" % self._requested_speeds)
         
+        '''
         all_aligned = True
         if self.wait_for_align:
             for key in self.modules:
@@ -441,14 +442,16 @@ class SwerveDrive:
         #print("All aligned: ", all_aligned, " Wait for align: ", self.wait_for_align)
         if all_aligned or not self.wait_for_align:
             
-            for key in self.modules:
-                self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
+            
                 
         elif not all_aligned and self.wait_for_align:
             for key in self.modules:
                 self.modules[key].move(0, self._requested_angles[key])
             
-        self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
+        self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)'''
+        
+        for key in self.modules:
+            self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
 
         for key in self.modules:
             self.modules[key].execute()

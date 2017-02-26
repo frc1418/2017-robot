@@ -1,29 +1,43 @@
 {
 	"pyfrc": {
 		"robot": {
-			"w": 3,
-			"h": 2,
+			"w": 3.6,
+			"h": 3,
 			"starting_x": 25,
 			"starting_y": 25,
 			"starting_angle": 180
 		},
 		"analog": {
-			"1": "Rear Right Rotation Encoder",
+			"0": "Rear Right Rotation Encoder",
 			"2": "Rear Left Rotation Encoder",
-			"3": "Front Right Rotation Encoder",
-			"4": "Front Left Rotation Encoder"
+			"1": "Front Right Rotation Encoder",
+			"3": "Front Left Rotation Encoder",
+			"4": "Pressure Sensor"
 		},
 		"pwm": {
-			"1": "Rear Right Rotation Motor",
-			"2": "Rear Left Rotation Motor",
-			"3": "Front Right Rotation Motor",
-			"4": "Front Left Rotation Motor"
+			"3": "Rear Right Rotation Motor",
+			"1": "Rear Left Rotation Motor",
+			"2": "Front Right Rotation Motor",
+			"0": "Front Left Rotation Motor",
+			"4": "Climb Motor 1",
+			"5": "Climb Motor 2",
+			"6": "Gimbal Yaw",
+			"7": "Gimbal Pitch",
+			"8": "Intake Motor",
+			"9": "Belt Motor"
 		},
 		"CAN": {
-			"10": "Rear Right Drive Motor",
-			"15": "Rear Left Drive Motor",
-			"20": "Front Right Drive Motor",
-			"25": "Front Left Drive Motor"
+			"30": "Rear Right Drive Motor",
+			"20": "Rear Left Drive Motor",
+			"10": "Front Right Drive Motor",
+			"5": "Front Left Drive Motor",
+			"15": "Shooter Motor"
+		},
+		"solenoid": {
+			"4": "Pivot Forward",
+			"5": "Pivot Reverse",
+			"6": "Picker Forward",
+			"7": "Picker Reverse"
 		},
 		"field": {
 			"w": 27,

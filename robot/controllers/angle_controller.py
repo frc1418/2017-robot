@@ -70,7 +70,21 @@ class AngleController(BasePIDComponent):
                 error = error + 360.0
         
         return abs(error) < self.kToleranceDegrees
-
+    
+    def is_aligned_to(self, setpoint):
+        
+        angle = self.get_angle()
+        
+        # compensate for wraparound (code from PIDController)
+        error = setpoint - angle
+        if abs(error) > 180.0:
+            if error > 0:
+                error = error - 360.0
+            else:
+                error = error + 360.0
+        
+        return abs(error) < self.kToleranceDegrees
+    
     def reset_angle(self):
         self.navx.reset()
     

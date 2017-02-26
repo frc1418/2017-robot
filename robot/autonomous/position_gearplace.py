@@ -32,7 +32,7 @@ class RightSideGearPlace(VictisAuto):
     out_distance = tunable(7.5)
     rotate_to_angle = tunable(-60)
     wiggle_value = tunable(-5)
-    to_gear_distance = tunable(2.5)
+    to_gear_distance = tunable(2)
     drive_back_distance = tunable(-2.7)
     drive_past_line_distance = tunable(5)
 
@@ -56,6 +56,11 @@ class RightSideGearPlace(VictisAuto):
         
         if self.angle_ctrl.is_aligned():
             self.next_state("drive_to_gear")
+            
+    @timed_state(duration=0.5, next_state="drive_to_gear")
+    def check_rotate(self):
+        if not self.angle_ctrl.is_aligned_to(self.rotate_to_angle * self.DIRECTION):
+            self.next_state('rotate')
             
     @timed_state(duration = 3, next_state='rcw_with_gear')
     def drive_to_gear(self, initial_call):
@@ -129,7 +134,7 @@ class ShootLeftSideGearPlace(RightSideGearPlace):
     
     DIRECTION = -1
     
-    drive_back_distance = tunable(-3)
+    drive_back_distance = tunable(-4)
     at_tower_angle = tunable(40)
     
     shooter = shooter.Shooter
@@ -252,7 +257,7 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     moving_angle_ctrl = MovingAngleController
     
     drive_back_distance = tunable(-3)
-    strafe_tower_distance = tunable(-3.75)
+    strafe_tower_distance = tunable(-4)
     at_tower_angle = tunable(55)
             
     @timed_state(duration = 5, next_state='failed')
@@ -286,9 +291,14 @@ class ShootMiddleGearPlace(MiddleGearPlace):
         
         if self.angle_ctrl.is_aligned():
             self.drive.set_raw_rcw(0.0)
-            self.next_state('sit_and_shoot')
+            self.next_state('check_angle')
             self.shooter.force_spin()
-            
+    
+    @timed_state(duration = 0.5, next_state='sit_and_shoot')
+    def check_angle(self):
+        if not self.angle_ctrl.is_aligned_to(self.at_tower_angle):
+            self.next_state('align_to_tower')
+    
     @timed_state(duration = 8, next_state = 'done')
     def sit_and_shoot(self):
         
