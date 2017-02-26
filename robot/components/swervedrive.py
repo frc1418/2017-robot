@@ -132,7 +132,7 @@ class SwerveDrive:
                 data[key] = data[key] / maxMagnitude
         return data
     
-    def prepare_for_teleop(self):
+    def flush(self):
         self._requested_vectors = {
                 'fwd': 0,
                 'strafe': 0,
@@ -154,7 +154,7 @@ class SwerveDrive:
         }
         
         for module in self.modules.values():
-            module.prepare_for_teleop()
+            module.flush()
         
     
     def enable_position_prediction(self, zero_position = True):

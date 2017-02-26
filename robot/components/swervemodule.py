@@ -89,7 +89,7 @@ class SwerveModule:
         
         self.drive_encoder_zero = self.driveMotor.getPosition()
     
-    def prepare_for_teleop(self):
+    def flush(self):
         self._requested_voltage = self.encoder.getVoltage()
         self._requested_speed = 0
     
