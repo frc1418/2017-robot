@@ -5,15 +5,13 @@ import time
 import threading
 
 from controllers.angle_controller import AngleController
-from controllers.pos_controller import XPosController, YPosController
-
+from components import swervedrive
 from collections import deque
 
 class PositionHistory:
     
     angle_ctrl = AngleController
-    x_ctrl = XPosController
-    y_ctrl = YPosController
+    
     
     def __init__(self):
         
@@ -83,7 +81,7 @@ class PositionHistory:
                 
                 now = self.get_now()
                 angle = self.angle_ctrl.get_angle()
-                x = self.x_crtl.get_position()
+                x = self.x_ctrl.get_position()
                 y = self.y_ctrl.get_position()
                 
                 with self.lock:

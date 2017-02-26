@@ -8,6 +8,7 @@ from networktables.util import ntproperty
 from components.swervedrive import SwerveDrive
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController
+from controllers.position_history import PositionHistory
 
 class AutoAlign(StateMachine):
     drive = SwerveDrive

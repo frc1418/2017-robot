@@ -23,7 +23,7 @@ class ImageProcessor:
     thresh_hue_high = ntproperty('/camera/processor/thresholds/hue_high', 100)
     thresh_sat_lower = ntproperty('/camera/processor/thresholds/sat_low', 150)
     thresh_sat_high = ntproperty('/camera/processor/thresholds/sat_high', 255)
-    thresh_val_lower = ntproperty('/camera/processor/thresholds/val_low', 140)
+    thresh_val_lower = ntproperty('/camera/processor/thresholds/val_low', 76)
     thresh_val_high = ntproperty('/camera/processor/thresholds/val_high', 255)
     
     square_tolerance = ntproperty('/camera/processor/square_tolerance', 10)
@@ -45,10 +45,6 @@ class ImageProcessor:
         self.thresh_high = np.array([self.thresh_hue_high, self.thresh_sat_high, self.thresh_val_high], dtype=np.uint8)
         
         self.nt = NetworkTable.getTable('/camera/processor')
-        
-        #self.target = NumberArray()
-        #self.nt.putValue('target', self.target)
-        
         
     def preallocate(self, img):
         if self.size is None or self.size[0] != img.shape[0] or self.size[1] != img.shape[1]:
@@ -227,14 +223,14 @@ class ImageProcessor:
         #print('target c')
         height = self.VFOV * target_info['cy'] / h - self.VFOV/2.0
         angle = self.HFOV * target_info['cx'] / w - self.HFOV/2.0
-        print('Height %s' % height)
-        print('Angle %s' % angle)
+        #print('Height %s' % height)
+        #print('Angle %s' % angle)
         
         self.nt.putBoolean('gear_target_present', True)
         self.nt.putBoolean('gear_target_partial', partial)
         
+        skew = None
         if not partial:
-            skew = 0
             if primary_target['h'] < secondary_target['h']:
                 skew = secondary_target['h']/primary_target['h']
                 skew -= 1
@@ -252,20 +248,18 @@ class ImageProcessor:
             else:
                 displacement = primary_target['h'] - secondary_target['h']
                 '''
-            print("Skew %s" % skew)    
+            #print("Skew %s" % skew)    
             self.nt.putNumber('gear_target_skew', skew)
+            
+            target = (angle, skew, time)
+        
+            self.nt.putNumberArray('target', target)
             
         self.nt.putNumber('gear_target_angle', angle)
         self.nt.putNumber('gear_target_height', height)
         
         if self.draw_gear_target:
             cv2.drawContours(self.out, [main_target_contour], -1, self.RED, 2, lineType=8)
-            
-        #self.target.clear()
-        
-        #self.target += [angle, skew, time]
-        
-        #self.nt.putValue('target', self.target)
 
     
     def process_frame(self, frame, time):
