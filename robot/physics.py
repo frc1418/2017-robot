@@ -59,14 +59,14 @@ class PhysicsEngine:
 
         try:
             #RR Motor
-            hal_data['CAN'][30]['enc_position'] -= hal_data['CAN'][30]['value'] / 1023 * tm_diff * 1000000
+            hal_data['CAN'][30]['enc_position'] += hal_data['CAN'][30]['value'] / 1023 * tm_diff * 300000
             #RL Motor
-            hal_data['CAN'][20]['enc_position'] -= hal_data['CAN'][20]['value'] / 1023 * tm_diff * 1000000
+            hal_data['CAN'][20]['enc_position'] -= hal_data['CAN'][20]['value'] / 1023 * tm_diff * 300000
             #FR Motor
-            hal_data['CAN'][10]['enc_position'] -= hal_data['CAN'][10]['value'] / 1023 * tm_diff * 1000000
+            hal_data['CAN'][10]['enc_position'] += hal_data['CAN'][10]['value'] / 1023 * tm_diff * 300000
             #FL Motor
-            hal_data['CAN'][5]['enc_position'] -= hal_data['CAN'][5]['value'] / 1023 * tm_diff * 1000000
-            #print(rr_motor)
+            hal_data['CAN'][5]['enc_position'] -= hal_data['CAN'][5]['value'] / 1023 * tm_diff * 300000
+            #print(hal_data['CAN'][5]['enc_position'])
 
         except:
             pass
