@@ -12,8 +12,8 @@ class Shooter(StateMachine):
     max_shooter_speed = tunable(-0.9)
 
     def stop(self):
-        self.shooter_motor.set(0)
-        self.belt_motor.set(0)
+        self.shooter_speed = 0
+        self.belt_speed = 0
 
         self.done()
 
@@ -38,3 +38,5 @@ class Shooter(StateMachine):
     def execute(self):
         self.belt_motor.set(self.belt_speed)
         self.shooter_motor.set(self.shooter_speed)
+        self.belt_speed = 0
+        self.shooter_speed = 0
