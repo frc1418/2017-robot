@@ -22,8 +22,6 @@ class RightSideGearPlace(VictisAuto):
     drive = swervedrive.SwerveDrive
     gear_picker = gearpicker.GearPicker
     
-    
-    
     x_ctrl = XPosController
     y_ctrl = YPosController
     angle_ctrl = AngleController
@@ -40,6 +38,7 @@ class RightSideGearPlace(VictisAuto):
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
+            self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()
@@ -179,6 +178,7 @@ class MiddleGearPlace(VictisAuto):
     def drive_out(self, initial_call):
         # Go forward
         if initial_call:
+            self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
             self.drive.enable_position_prediction()

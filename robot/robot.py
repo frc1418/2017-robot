@@ -128,7 +128,7 @@ class MyRobot(magicbot.MagicRobot):
         """Do when teleoperated mode is started."""
         self.drive.flush() #This is a poor solution to the drive system maintain speed/direction
         
-        self.drive._field_centric = True # Doesn't set the property becuase the property resets the navx
+        self.drive.field_centric = True # Doesn't set the property becuase the property resets the navx
         self.drive.allow_reverse = False
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
@@ -145,6 +145,8 @@ class MyRobot(magicbot.MagicRobot):
             self.drive.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0)*-1, self.left_joystick.getRawAxis(2)*-1)
 
         if self.field_centric_button.get():
+            if not self.drive.field_centric:
+                self.navx.reset()
             self.drive.field_centric = not self.drive.field_centric
             
         if self.left_joystick.getRawButton(2):
@@ -155,10 +157,13 @@ class MyRobot(magicbot.MagicRobot):
             self.drive.rotation_multiplier = 0.75
             
         if self.right_joystick.getRawButton(4):
+            self.drive.field_centric = False
             self.drive.set_raw_strafe(0.25)
-        
-        if self.right_joystick.getRawButton(5):
+        elif self.right_joystick.getRawButton(5):
+            self.drive.field_centric = False
             self.drive.set_raw_strafe(-0.25)
+        else:
+            self.drive.field_centric = True
 
         # Gear picker
         if self.pivot_toggle_button.get():

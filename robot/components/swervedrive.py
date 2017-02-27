@@ -96,20 +96,6 @@ class SwerveDrive:
         
         for module in self.modules.values():
             module.allow_reverse = value
-    
-    @property
-    def field_centric(self):
-        return self._field_centric
-    
-    @field_centric.setter
-    def field_centric(self, value):
-        if self.navx is None:
-            self._field_centric = False
-        else:
-            self._field_centric = value
-            
-            if value:
-                self.navx.reset()
         
     @staticmethod
     def square_input(input):
@@ -187,64 +173,84 @@ class SwerveDrive:
             
     def _predict_position(self):
         #TODO: Clean up this function. its a mess.
-        if self.modules['front_left'].has_drive_encoder and self.modules['rear_right'].has_drive_encoder:
-            
-            #print('Predicting Position!!!!!!')
-            fl_dist = self.modules['front_left'].get_drive_encoder_distance()
-            fl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_left'].get_voltage())
-            #if abs(fl_dist) < 0.1:
-                #return
-            self.modules['front_left'].zero_drive_encoder()
-            
-            
+        
+        encoders = 0
+        radius = math.sqrt(((self.length) ** 2)+((self.width) ** 2))
+        
+        #Gather rear right wheel data
+        rr_dist = 0
+        rr_theta = 0
+        
+        if self.modules['rear_right'].has_drive_encoder:
             rr_dist = self.modules['rear_right'].get_drive_encoder_distance()
             rr_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['rear_right'].get_voltage())
             self.modules['rear_right'].zero_drive_encoder()
             
-            radius = math.sqrt(((self.length) ** 2)+((self.width) ** 2))
+            encoders += 1
+        
+        #Gather front left wheel data
+        fl_dist = 0
+        fl_theta = 0
+        
+        if self.modules['front_left'].has_drive_encoder:
+            fl_dist = self.modules['front_left'].get_drive_encoder_distance()
+            fl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_left'].get_voltage())
+            self.modules['front_left'].zero_drive_encoder()
             
-            # degree / 360 = dist / 2 * pi * r
-            # C = 2 * pi * r
-            # degree / 360 = dist / C
-            # degree = 360 * (dist / C)
-            # d * (360 / 2 * pi * r) = degree
-            
-            fl_y = math.cos(fl_theta) * fl_dist
-            fl_x = -math.sin(fl_theta) * fl_dist
-            fl_rcw = -((math.cos((fl_theta + (math.pi/4)) % (2*math.pi)) * fl_dist) / (2*math.pi*radius)) * 360#TODO: Check rotation math
-            
-            
-            rr_y = math.cos(rr_theta) * rr_dist
-            rr_x = -math.sin(rr_theta) * rr_dist
-            rr_rcw = -((math.cos((rr_theta + (math.pi/4)) % (2*math.pi)) * rr_dist) / (2*math.pi*radius)) * 360
-            
-            #raise 'hi'
-            self._predicted_position['fwd'] += (fl_y + rr_y) / 2#Halved because measured from two drive encoders
-            self._predicted_position['strafe'] += (fl_x + rr_x) / 2
-            self._predicted_position['rcw'] += (fl_rcw + rr_rcw) #This should be halved but isn't becuase robots are strange 
-            
-        if self.modules['front_right'].has_drive_encoder and self.modules['rear_left'].has_drive_encoder:
+            encoders += 1
+        
+        # Gather front right wheel data
+        fr_dist = 0
+        fr_theta = 0
+        
+        if self.modules['front_right'].has_drive_encoder:
             fr_dist = self.modules['front_right'].get_drive_encoder_distance()
             fr_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['front_right'].get_voltage())
             self.modules['front_right'].zero_drive_encoder()
             
+            encoders += 1
+        
+        # Gather right left wheel data   
+        rl_dist = 0
+        rl_theta = 0
+        
+        if self.modules['rear_left'].has_drive_encoder:
             rl_dist = self.modules['rear_left'].get_drive_encoder_distance()
             rl_theta = swervemodule.SwerveModule.voltage_to_rad(self.modules['rear_left'].get_voltage())
             self.modules['rear_left'].zero_drive_encoder()
             
-            radius = math.sqrt((self.length ** 2)+(self.width ** 2))
-            
-            fr_x = math.cos(fr_theta) * fr_dist
-            fr_y = math.sin(fr_theta) * fr_dist
-            fr_rcw = -((math.cos((fr_theta + (math.pi/4)) % (2*math.pi)) * fr_dist) / (2*math.pi*radius)) * 360 #TODO: Check rotation math
-            
-            rl_x = math.cos(rl_theta) * rl_dist
-            rl_y = math.sin(rl_theta) * rl_dist
-            rl_rcw = ((math.cos((rl_theta + (math.pi/4)) % (2*math.pi)) * rl_dist) / (2*math.pi*radius)) * 360
-            
-            self._predicted_position['fwd'] += (fr_y + rl_y) / 2
-            self._predicted_position['strafe'] += (fr_x + rl_x) / 2
-            self._predicted_position['rcw'] += (fr_rcw + rl_rcw)
+            encoders += 1
+        
+        # Calculate field centric if drive system is in field centric mode
+        if self.field_centric:
+                global_theta = math.radians(self.navx.yaw)
+                
+                rr_theta -= global_theta
+                fl_theta -= global_theta
+                fr_theta -= global_theta
+                rl_theta -= global_theta
+                
+                rr_theta %= (2 * math.pi)
+                fl_theta %= (2 * math.pi)
+                fr_theta %= (2 * math.pi)
+                rl_theta %= (2 * math.pi)
+        
+        # Predict x and y components of translation vector   
+        #print('rl_y: ', (math.cos(rl_theta) * rl_dist), ', rr_y: ', (math.cos(rr_theta) * rr_dist), ', fl_y: ', (math.cos(fl_theta) * fl_dist), ', fr_y: ', (math.cos(fr_theta) * fr_dist))     
+        predicted_x = (math.sin(rl_theta) * rl_dist) + (math.sin(rr_theta) * rr_dist) + (math.sin(fl_theta) * fl_dist) + (math.sin(fr_theta) * fr_dist) 
+        predicted_y = (math.cos(rl_theta) * rl_dist) + (math.cos(rr_theta) * rr_dist) + (math.cos(fl_theta) * fl_dist) + (math.cos(fr_theta) * fr_dist)
+        
+        # Predict rotation vector
+        rl_theta = (rl_theta + (math.pi / 4)) % (2 * math.pi)
+        rr_theta = (rr_theta - (math.pi / 4)) % (2 * math.pi)
+        fl_theta = (fl_theta - (math.pi / 4)) % (2 * math.pi)
+        fr_theta = (fr_theta + (math.pi / 4)) % (2 * math.pi)
+        
+        predicted_rcw = radius * ((math.cos(rl_theta) * rl_dist) + (math.cos(rr_theta) * -rr_dist) + (math.cos(fl_theta) * fl_dist) + (math.cos(fr_theta) * -fr_dist))
+        
+        self._predicted_position['fwd'] += predicted_y * (1/encoders)
+        self._predicted_position['strafe'] += predicted_x * (1/encoders)
+        self._predicted_position['rcw'] += predicted_rcw * (1/encoders)
         
     def get_predicted_x(self):
         if not self.predict_position:
@@ -321,29 +327,34 @@ class SwerveDrive:
             strafe = math.cos(theta)*r
             
         
-        if self.field_centric:
-            theta = math.radians(360-self.navx.yaw)
-            
-            fwdX = fwd * math.cos(theta)
-            fwdY = (-fwd) * math.sin(theta) # TODO: verify and understand why fwd is neg
-            strafeX = strafe * math.cos(theta)
-            strafeY = strafe * math.sin(theta)
-            
-            fwd = fwdX + strafeY
-            strafe = fwdY + strafeX
-        
-        
         self._requested_vectors['fwd'] = fwd
         self._requested_vectors['strafe'] = strafe
         self._requested_vectors['rcw'] = rcw
         
         #print(self._requested_vectors)
         
+    def _apply_field_centric(self):
+        theta = math.radians(360-self.navx.yaw)
+            
+        fwdX = self._requested_vectors['fwd'] * math.cos(theta)
+        fwdY = (-self._requested_vectors['fwd']) * math.sin(theta) # TODO: verify and understand why fwd is neg
+        strafeX = self._requested_vectors['strafe'] * math.cos(theta)
+        strafeY = self._requested_vectors['strafe'] * math.sin(theta)
+        
+        fwd = fwdX + strafeY
+        strafe = fwdY + strafeX
+        
+        self._requested_vectors['fwd'] = fwd
+        self._requested_vectors['strafe'] = strafe
+        
     def _calculate_vectors(self):
         '''
         Calculates the requested speed and angle of each modules from self._requested_vectors and stores them in
         self._requested_speeds and self._requested_speeds dictionaries. 
         '''
+        
+        if self.field_centric:
+            self._apply_field_centric() 
         
         #Does nothing if the values are lower than the input thresh
         if self.threshold_input_vectors:
@@ -359,6 +370,8 @@ class SwerveDrive:
             if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
                 self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
                 return
+            
+        #print("Yaw: ", self.navx.yaw, self._requested_vectors)
 
         ratio = math.sqrt((self.length ** 2)+(self.width ** 2))
         # Velocities per quadrant
