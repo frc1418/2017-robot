@@ -1,8 +1,9 @@
 from magicbot.state_machine import state, timed_state
 from components import swervedrive
-from controllers.pos_controller import XPosController, YPosController
+from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
+from controllers.position_tracker import PositionTracker, FCPositionTracker
 from .base_auto import VictisAuto
 
 import wpilib
@@ -28,6 +29,7 @@ class DriveStraightTest(VictisAuto):
     DEFAULT = False
     
     drive = swervedrive.SwerveDrive
+    tracker = PositionTracker
     y_ctrl = YPosController
     
     drive_distance_feet = tunable(5) #Feet
@@ -38,7 +40,7 @@ class DriveStraightTest(VictisAuto):
         if initial_call:
             self.drive.field_centric = False
             self.sd = NetworkTable.getTable("SmartDashboard")
-            self.drive.enable_position_prediction()
+            self.tracker.enable()
         
         self.y_ctrl.move_to(self.drive_distance_feet)
         self.sd.putNumber("TESTING: ", self.y_ctrl.get_position())
@@ -52,7 +54,7 @@ class DriveStraightTest(VictisAuto):
         
     @state
     def finish(self):
-        self.drive.disable_position_prediction()
+        self.tracker.disable()
 
 class DriveLeftTest(VictisAuto):
     MODE_NAME = 'Drive_Left_Test'
@@ -126,11 +128,14 @@ class DriveStraightWithGyroTest(VictisAuto):
     DEFAULT = False
     
     drive = swervedrive.SwerveDrive
-    y_ctrl = YPosController
+    fc_y_ctrl = FCYPosController
     moving_angle_ctrl = MovingAngleController
     
+    
+    fc_tracker = FCPositionTracker
+    
     drive_distance_feet = tunable(5) #Feet
-    align_to = tunable(180) #Deg
+    align_to = tunable(0) #Deg
         
     
     @timed_state(duration=10.0, first=True, next_state='failed_distance')
@@ -138,12 +143,12 @@ class DriveStraightWithGyroTest(VictisAuto):
         if initial_call:
             self.drive.field_centric = True
             self.moving_angle_ctrl.reset_angle()
-            self.drive.enable_position_prediction()
+            self.fc_tracker.enable()
         
         self.moving_angle_ctrl.align_to(self.align_to)
-        self.y_ctrl.move_to(self.drive_distance_feet)
+        self.fc_y_ctrl.move_to(self.drive_distance_feet)
         
-        if self.y_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location():
             self.next_state('finish')
             
     @state
@@ -152,14 +157,15 @@ class DriveStraightWithGyroTest(VictisAuto):
         
     @state
     def finish(self):
-        self.drive.disable_position_prediction()
+        self.fc_tracker.disable()
 
 class AlignAndPlace(VictisAuto):
     MODE_NAME = 'Align_and_place'
     DEFAULT = False
     
     drive = swervedrive.SwerveDrive
-    y_ctrl = YPosController
+    fc_y_ctrl = FCYPosController
+    fc_tracker = FCPositionTracker
     x_ctrl = XPosController
     angle_ctrl = AngleController
     pos_history = PositionHistory
@@ -170,6 +176,7 @@ class AlignAndPlace(VictisAuto):
             self.drive.field_centric = False
             self.drive.enable_position_prediction()
             self.pos_history.enable()
+            
             
     @state
     def failed_distance(self):

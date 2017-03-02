@@ -64,7 +64,6 @@ class SwerveModule:
         self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False);
         
         self.has_drive_encoder = kwargs.pop("has_drive_encoder", False)
-        self.drive_encoder_zero = 0
 
     def set_pid(self, p, i, d):
         self._pid_controller.setPID(p, i, d)
@@ -76,19 +75,13 @@ class SwerveModule:
         if not self.has_drive_encoder:
             return False
         
-        return self.driveMotor.getPosition() - self.drive_encoder_zero
+        return self.driveMotor.getPosition()
     
     def get_drive_encoder_distance(self):
         if not self.has_drive_encoder:
             return False
         
-        return ((self.driveMotor.getPosition() - self.drive_encoder_zero) * WHEEL_CIRCUMFERENCE) / WHEEL_TICKS_PER_REV
-    
-    def zero_drive_encoder(self):
-        if not self.has_drive_encoder:
-            return False
-        
-        self.drive_encoder_zero = self.driveMotor.getPosition()
+        return ((self.driveMotor.getPosition()) * WHEEL_CIRCUMFERENCE) / WHEEL_TICKS_PER_REV
     
     def flush(self):
         self._requested_voltage = self.encoder.getVoltage()

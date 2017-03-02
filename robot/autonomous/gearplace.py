@@ -1,7 +1,7 @@
 from .base_auto import VictisAuto
 
 from components import swervedrive, gearpicker, shooter
-from controllers import angle_controller, pos_controller, position_history
+from controllers import angle_controller, pos_controller, position_history, position_tracker
 
 from magicbot.state_machine import timed_state, state, AutonomousStateMachine
 from magicbot.magic_tunable import tunable
@@ -21,8 +21,15 @@ class MiddleGearPlace(VictisAuto):
     
     x_ctrl = pos_controller.XPosController
     y_ctrl = pos_controller.YPosController
+    
+    fc_y_ctrl = pos_controller.FCYPosController
+    fc_x_ctrl = pos_controller.FCXPosController
+    
     angle_ctrl = angle_controller.AngleController
     moving_angle_ctrl = angle_controller.MovingAngleController
+    
+    tracker = position_tracker.PositionTracker
+    fc_tracker = position_tracker.FCPositionTracker
     
     m_direction = tunable(1, subtable='middle') # When direction is 1 the shooting tower is left of the robot
     
@@ -50,27 +57,27 @@ class MiddleGearPlace(VictisAuto):
         self.drive.field_centric = True
         self.gear_picker._picker_state = 2
         self.angle_ctrl.reset_angle()
-        self.drive.enable_position_prediction()
+        self.fc_tracker.enable()
         
         self.next_state('middle_drive_to_gear')
         
     @timed_state(duration=4, next_state='middle_try_place')
     def middle_drive_to_gear(self):
-        self.x_ctrl.move_to(self.m_out_x)
-        self.y_ctrl.move_to(self.m_out_y)
+        self.fc_x_ctrl.move_to(self.m_out_x)
+        self.fc_y_ctrl.move_to(self.m_out_y)
         self.moving_angle_ctrl.align_to(0)
         
-        if self.y_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location():
             self.gear_picker._picker_state = 1
             self.next_state('middle_drive_back')
             
     @timed_state(duration=1, next_state='middle_drive_back')        
     def middle_try_place(self):
-        self.x_ctrl.move_to(self.m_out_x)
-        self.y_ctrl.move_to(self.m_out_y)
+        self.fc_x_ctrl.move_to(self.m_out_x)
+        self.fc_y_ctrl.move_to(self.m_out_y)
         self.drive.set_raw_rcw(0.4)
         
-        if self.y_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location():
             self.next_state('middle_drive_back')
             
     @timed_state(duration = 3, next_state='failed')
@@ -78,10 +85,10 @@ class MiddleGearPlace(VictisAuto):
         if initial_call:
             self.gear_picker._picker_state = 1
             
-        self.y_ctrl.move_to(self.m_back_y)
+        self.fc_y_ctrl.move_to(self.m_back_y)
         self.moving_angle_ctrl.align_to(0)
         
-        if self.y_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location():
             self.next_state('transition')
             
     ############################################ 
@@ -94,8 +101,8 @@ class MiddleGearPlace(VictisAuto):
     
     @timed_state(duration = 5, next_state='failed')
     def middle_to_tower(self):
-        self.y_ctrl.move_to(self.m_tower_y)
-        self.x_ctrl.move_to(self.m_tower_x * self.m_direction)
+        self.fc_y_ctrl.move_to(self.m_tower_y)
+        self.fc_x_ctrl.move_to(self.m_tower_x * self.m_direction)
         self.moving_angle_ctrl.align_to(self.m_tower_angle * self.m_direction)
         
         self.shooter.force_spin()
@@ -148,8 +155,15 @@ class SideGearPlace(VictisAuto):
     
     x_ctrl = pos_controller.XPosController
     y_ctrl = pos_controller.YPosController
+    
+    fc_y_ctrl = pos_controller.FCYPosController
+    fc_x_ctrl = pos_controller.FCXPosController
+    
     angle_ctrl = angle_controller.AngleController
     moving_angle_ctrl = angle_controller.MovingAngleController
+    
+    tracker = position_tracker.PositionTracker
+    fc_tracker = position_tracker.FCPositionTracker
     
     s_direction = tunable(1, subtable='side') # When set to 1 this will run gear place on the right side
     
@@ -181,7 +195,7 @@ class SideGearPlace(VictisAuto):
         self.drive.field_centric = True
         self.gear_picker._picker_state = 2
         self.angle_ctrl.reset_angle()
-        self.drive.enable_position_prediction()
+        self.fc_tracker.enable()
         
         self.next_state('side_drive_to_gear')
         
@@ -337,7 +351,6 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
     @state
     def finish(self):
         self.drive.flush()
-        self.next_state('done')
         
     
 

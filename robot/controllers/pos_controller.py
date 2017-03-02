@@ -5,10 +5,12 @@ from magicbot import tunable
 
 from components import swervedrive
 from .my_pid_base import BasePIDComponent
+from . import field_centric, position_tracker
 
 class XPosController(BasePIDComponent):
     
     drive = swervedrive.SwerveDrive
+    tracker = position_tracker.PositionTracker
     
     kP = tunable(0.1)
     kI = tunable(0.0)
@@ -25,7 +27,7 @@ class XPosController(BasePIDComponent):
         #self.pid.setOutputRange(-1.0, 1.0)
     
     def get_position(self):
-        return self.drive.get_predicted_x() / 1.0
+        return self.tracker.get_x() / 1.0
     
     def move_to(self, position):
         self.setpoint = position
@@ -51,6 +53,7 @@ class XPosController(BasePIDComponent):
 class YPosController(BasePIDComponent):
         
     drive = swervedrive.SwerveDrive
+    tracker = position_tracker.PositionTracker
     
     kP = tunable(0.09)
     kI = tunable(0.0)
@@ -66,7 +69,7 @@ class YPosController(BasePIDComponent):
         self.set_abs_output_range(0.16, 0.65)   
     
     def get_position(self):
-        return self.drive.get_predicted_y() / 1.0
+        return self.tracker.get_y() / 1.0
     
     def move_to(self, position):
         self.setpoint = position
@@ -85,3 +88,38 @@ class YPosController(BasePIDComponent):
             else:
                 self.drive.set_raw_fwd(self.rate)
 
+class FCXPosController(XPosController):
+    
+    field_centric = field_centric.FieldCentric
+    fc_tracker = position_tracker.FCPositionTracker
+    
+    def get_position(self):
+        return self.fc_tracker.get_x() / 1.0
+    
+    def execute(self):
+        
+        super().execute()
+        
+        if self.rate is not None:
+            if self.is_at_location():
+                self.field_centric.set_strafe(0)
+            else:
+                self.field_centric.set_strafe(self.rate)
+
+class FCYPosController(YPosController):
+    
+    field_centric = field_centric.FieldCentric
+    fc_tracker = position_tracker.FCPositionTracker
+    
+    def get_position(self):
+        return self.fc_tracker.get_y() / 1.0
+    
+    def execute(self):
+        
+        super().execute()
+        
+        if self.rate is not None:
+            if self.is_at_location():
+                self.field_centric.set_fwd(0)
+            else:
+                self.field_centric.set_fwd(self.rate)
