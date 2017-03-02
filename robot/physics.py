@@ -67,18 +67,19 @@ class PhysicsEngine:
             #FL Motor
             hal_data['CAN'][5]['enc_position'] -= hal_data['CAN'][5]['value'] / 1023 * tm_diff * 300000
             #print(hal_data['CAN'][5]['enc_position'])
-
+            
+            rr_motor = hal_data['CAN'][30]['value'] / 1023
+            lr_motor = -hal_data['CAN'][20]['value'] / 1023
+            rf_motor = hal_data['CAN'][10]['value'] / 1023
+            lf_motor = -hal_data['CAN'][5]['value'] / 1023
+            
+            #def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angle, rr_angle, lf_angle, rf_angle, x_wheelbase=2, y_wheelbase=2, speed=5):
+            vx, vy, vw = four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, self.lr_degrees, self.rr_degrees, self.lf_degrees, self.rf_degrees, x_wheelbase = 3, y_wheelbase = 3.6, speed=9)
+            self.controller.vector_drive(vx, vy, vw, tm_diff)
         except:
             pass
         
-        rr_motor = hal_data['CAN'][30]['value'] / 1023
-        lr_motor = -hal_data['CAN'][20]['value'] / 1023
-        rf_motor = hal_data['CAN'][10]['value'] / 1023
-        lf_motor = -hal_data['CAN'][5]['value'] / 1023
         
-        #def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angle, rr_angle, lf_angle, rf_angle, x_wheelbase=2, y_wheelbase=2, speed=5):
-        vx, vy, vw = four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, self.lr_degrees, self.rr_degrees, self.lf_degrees, self.rf_degrees, x_wheelbase = 3, y_wheelbase = 3.6, speed=9)
-        self.controller.vector_drive(vx, vy, vw, tm_diff)
         
 def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angle, rr_angle, lf_angle, rf_angle, x_wheelbase=2, y_wheelbase=2, speed=5):
     '''

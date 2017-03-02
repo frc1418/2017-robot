@@ -6,7 +6,7 @@ from controllers import angle_controller, pos_controller, position_history
 from magicbot.state_machine import timed_state, state, AutonomousStateMachine
 from magicbot.magic_tunable import tunable
 
-class MiddleGearPlace:
+class MiddleGearPlace(VictisAuto):
     '''
     This state is meant the be extended and should never be run by itself 
     '''
@@ -133,7 +133,7 @@ class MiddleGearPlace:
     def middle_end(self):
         self.next_state('finish')
         
-class SideGearPlace:
+class SideGearPlace(VictisAuto):
     '''
     This state is meant the be extended and should never be run by itself 
     '''
@@ -211,7 +211,7 @@ class SideGearPlace:
     def side_drive_to_peg(self):
         self.y_ctrl.move_to(self.s_peg_y)
         self.x_ctrl.move_to(self.s_peg_x * self.s_direction) # POSSIBLE ERROR: x pos reaching location before y pos
-        self.moving_angle_ctrl(self.s_out_angle * self.s_direction)
+        self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
         if self.y_ctrl.is_at_location() and self.x_ctrl.is_at_location():
             self.next_state('side_drive_back')
@@ -241,14 +241,14 @@ class SideGearPlace:
     ############################################
 
     @state
-    def side_start_shooting(self):
+    def side_start_shoot(self):
         self.next_state('side_to_tower')
         
     @timed_state(duration=5, next_state='failed')
     def side_to_tower(self):
         self.y_ctrl.move_to(self.s_tower_y)
         self.x_ctrl.move_to(self.s_tower_x * self.s_direction)
-        self.moving_angle_ctrl.move_to(self.s_tower_angle * self.s_direction)
+        self.moving_angle_ctrl.align_to(self.s_tower_angle * self.s_direction)
         
         self.shooter.force_spin()
         
@@ -285,7 +285,7 @@ class SideGearPlace:
     def side_end(self):
         self.next_state('finish')
         
-class GearPlace(AutonomousStateMachine, MiddleGearPlace, SideGearPlace):
+class GearPlace(MiddleGearPlace, SideGearPlace):
     MODE_NAME = "Gear Place"
     DEFAULT = False
     DISABLED = False
@@ -316,7 +316,7 @@ class GearPlace(AutonomousStateMachine, MiddleGearPlace, SideGearPlace):
             self.s_direction = -1
             self.position = 'side'
         
-        print(self._StateMachine__states)
+        #print(self._StateMachine__states)
         
         print('Starting ', self.position, ' gear place')
         

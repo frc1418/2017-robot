@@ -44,14 +44,14 @@ class DriveStraightTest(VictisAuto):
         self.sd.putNumber("TESTING: ", self.y_ctrl.get_position())
         
         if self.y_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
             
     @state
     def failed_distance(self):
-        self.next_state('done')
+        self.next_state('finish')
         
     @state
-    def done(self):
+    def finish(self):
         self.drive.disable_position_prediction()
 
 class DriveLeftTest(VictisAuto):
@@ -74,14 +74,14 @@ class DriveLeftTest(VictisAuto):
         self.x_ctrl.move_to(self.drive_distance_feet)
         
         if self.x_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
             
     @state
     def failed_distance(self):
-        self.next_state('done')
+        self.next_state('finish')
         
     @state
-    def done(self):
+    def finish(self):
         self.drive.disable_position_prediction()
         
         
@@ -108,14 +108,14 @@ class GyroTest(VictisAuto):
         self.angle_ctrl.align_to(self.align_to)
         
         if self.angle_ctrl.is_aligned():
-            self.next_state('done')
+            self.next_state('finish')
             
     @state
     def failed_align(self):
-        self.next_state('done')
+        self.next_state('finish')
         
     @state
-    def done(self):
+    def finish(self):
         self.drive.set_raw_rcw(0.0)
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
@@ -144,14 +144,14 @@ class DriveStraightWithGyroTest(VictisAuto):
         self.y_ctrl.move_to(self.drive_distance_feet)
         
         if self.y_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
             
     @state
     def failed_distance(self):
-        self.next_state('done')
+        self.next_state('finish')
         
     @state
-    def done(self):
+    def finish(self):
         self.drive.disable_position_prediction()
 
 class AlignAndPlace(VictisAuto):
@@ -173,12 +173,7 @@ class AlignAndPlace(VictisAuto):
             
     @state
     def failed_distance(self):
-        self.next_state('done')
-        
-    @state
-    def done(self):
-        self.drive.set_raw_rcw(0.0)
-        self.drive.disable_position_prediction()
+        pass
         
     
     
