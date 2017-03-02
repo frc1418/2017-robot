@@ -13,7 +13,7 @@ from networktables.networktable import NetworkTable
 
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 
-from common import pressure_sensor, scale
+from common import pressure_sensor, scale, toggle_button
 
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
@@ -66,6 +66,13 @@ class MyRobot(magicbot.MagicRobot):
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
         self.predict_position = ButtonDebouncer(self.left_joystick, 7)
+        
+        self.field_centric_hot_switch = toggle_button.TrueToggleButton(self.left_joystick, 1)
+        
+        self.left_shimmy = toggle_button.TrueToggleButton(self.right_joystick, 4)
+        self.right_shimmy = toggle_button.TrueToggleButton(self.right_joystick, 5)
+        
+        self.align_button = toggle_button.TrueToggleButton(self.right_joystick, 10)
 
         # Shooting motors
         self.shooter_motor = ctre.CANTalon(15)
@@ -104,7 +111,7 @@ class MyRobot(magicbot.MagicRobot):
 
     def autonomous(self):
         """Prepare for autonomous mode."""
-        self.drive.allow_reverse = False
+        self.drive.allow_reverse = True
         self.drive.wait_for_align = True
         self.drive.threshold_input_vectors = True
         
@@ -122,14 +129,13 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledInit(self):
         """Do once right away when robot is disabled."""
-        self.drive.flush()
 
     def teleopInit(self):
         """Do when teleoperated mode is started."""
         self.drive.flush() #This is a poor solution to the drive system maintain speed/direction
         
         self.drive.field_centric = True # Doesn't set the property becuase the property resets the navx
-        self.drive.allow_reverse = False
+        self.drive.allow_reverse = True
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
         
@@ -148,6 +154,12 @@ class MyRobot(magicbot.MagicRobot):
             if not self.drive.field_centric:
                 self.navx.reset()
             self.drive.field_centric = not self.drive.field_centric
+        
+        
+        if self.field_centric_hot_switch.get() and self.drive.field_centric:
+            self.drive.field_centric = False
+        if self.field_centric_hot_switch.get_released() and not self.drive.field_centric:
+            self.drive.field_centric = True
             
         if self.left_joystick.getRawButton(2):
             self.drive.xy_multiplier = 0.5
@@ -162,9 +174,9 @@ class MyRobot(magicbot.MagicRobot):
         elif self.right_joystick.getRawButton(5):
             self.drive.field_centric = False
             self.drive.set_raw_strafe(-0.25)
-        else:
+        if self.left_shimmy.get_released() or self.right_shimmy.get_released():
             self.drive.field_centric = True
-
+            
         # Gear picker
         if self.pivot_toggle_button.get():
             if self.gear_picker._pivot_state == 1:
@@ -185,7 +197,7 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.climb()
             
         # Shooter
-        if self.left_joystick.getRawButton(1) or self.secondary_joystick.getRawButton(3):
+        if self.secondary_joystick.getRawButton(3):
             self.shooter.shoot()
         else:
             self.shooter.stop()
@@ -199,7 +211,7 @@ class MyRobot(magicbot.MagicRobot):
         # Auto align test
         if self.right_joystick.getRawButton(10):
             self.auto_align.align()
-        else:
+        if self.align_button.get_released():
             self.auto_align.done()
             
         self.update_sd()
