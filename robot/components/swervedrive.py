@@ -240,6 +240,9 @@ class SwerveDrive:
         predicted_x = (math.sin(rl_theta) * rl_dist) + (math.sin(rr_theta) * rr_dist) + (math.sin(fl_theta) * fl_dist) + (math.sin(fr_theta) * fr_dist) 
         predicted_y = (math.cos(rl_theta) * rl_dist) + (math.cos(rr_theta) * rr_dist) + (math.cos(fl_theta) * fl_dist) + (math.cos(fr_theta) * fr_dist)
         
+        # Make left negative
+        predicted_x *= -1
+        
         # Predict rotation vector
         rl_theta = (rl_theta + (math.pi / 4)) % (2 * math.pi)
         rr_theta = (rr_theta - (math.pi / 4)) % (2 * math.pi)

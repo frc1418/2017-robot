@@ -1,4 +1,4 @@
-from robotpy_ext.autonomous import state, timed_state, StatefulAutonomous
+from magicbot.state_machine import state, timed_state
 
 from .base_auto import VictisAuto
 
@@ -117,7 +117,7 @@ class RightSideGearPlace(VictisAuto):
         self.y_ctrl.move_to(self.drive_past_line_distance)
             
         if self.y_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
     
 class LeftSideGearPlace(RightSideGearPlace):
     'Place robot 15in from string 90deg to string'
@@ -149,13 +149,10 @@ class ShootLeftSideGearPlace(RightSideGearPlace):
             self.next_state('sit_and_shoot')
             self.shooter.shoot()
             
-    @timed_state(duration = 8, next_state = 'done')
+    @timed_state(duration = 8, next_state = 'finish')
     def sit_and_shoot(self):
         self.shooter.shoot()
         
-    @state
-    def done(self):
-        self.shooter.stop()
         
 class MiddleGearPlace(VictisAuto):
     MODE_NAME = "Middle Gear Place"
@@ -215,7 +212,7 @@ class MiddleGearPlace(VictisAuto):
         self.moving_angle_ctrl.align_to(0)
         
         if self.y_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
             
     '''
     
@@ -299,7 +296,7 @@ class ShootMiddleGearPlace(MiddleGearPlace):
         if not self.angle_ctrl.is_aligned_to(self.at_tower_angle):
             self.next_state('align_to_tower')
     
-    @timed_state(duration = 8, next_state = 'done')
+    @timed_state(duration = 8, next_state = 'finish')
     def sit_and_shoot(self):
         
         self.drive.debug(debug_modules=True)

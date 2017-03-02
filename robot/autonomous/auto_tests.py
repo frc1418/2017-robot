@@ -1,14 +1,15 @@
-from robotpy_ext.autonomous import state, timed_state, StatefulAutonomous
+from magicbot.state_machine import state, timed_state
 from components import swervedrive
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
+from .base_auto import VictisAuto
 
 import wpilib
 from networktables import NetworkTable
 from magicbot.magic_tunable import tunable
 
-class DriveTest(StatefulAutonomous):
+class DriveTest(VictisAuto):
     MODE_NAME = 'Drive_Test'
     DEFAULT = False
 
@@ -22,7 +23,7 @@ class DriveTest(StatefulAutonomous):
             self.drive.enable_position_prediction()
         self.drive.set_raw_fwd(0.5)
         
-class DriveStraightTest(StatefulAutonomous):
+class DriveStraightTest(VictisAuto):
     MODE_NAME = 'Drive_Straight_Test'
     DEFAULT = False
     
@@ -53,7 +54,7 @@ class DriveStraightTest(StatefulAutonomous):
     def done(self):
         self.drive.disable_position_prediction()
 
-class DriveLeftTest(StatefulAutonomous):
+class DriveLeftTest(VictisAuto):
     MODE_NAME = 'Drive_Left_Test'
     DEFAULT = False
     
@@ -84,7 +85,7 @@ class DriveLeftTest(StatefulAutonomous):
         self.drive.disable_position_prediction()
         
         
-class GyroTest(StatefulAutonomous):
+class GyroTest(VictisAuto):
     MODE_NAME = 'Gyro_Test'
     DEFAULT = False
     
@@ -120,7 +121,7 @@ class GyroTest(StatefulAutonomous):
         self.drive.threshold_input_vectors = True
         self.drive.disable_position_prediction()
 
-class DriveStraightWithGyroTest(StatefulAutonomous):
+class DriveStraightWithGyroTest(VictisAuto):
     MODE_NAME = 'Drive_Straight_With_Gyro_Test'
     DEFAULT = False
     
@@ -153,7 +154,7 @@ class DriveStraightWithGyroTest(StatefulAutonomous):
     def done(self):
         self.drive.disable_position_prediction()
 
-class AlignAndPlace(StatefulAutonomous):
+class AlignAndPlace(VictisAuto):
     MODE_NAME = 'Align_and_place'
     DEFAULT = False
     

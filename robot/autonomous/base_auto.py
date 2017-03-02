@@ -1,18 +1,18 @@
-from robotpy_ext.autonomous import state, StatefulAutonomous
+from magicbot.state_machine import state, AutonomousStateMachine
 
 from components import swervedrive
 
-class VictisAuto(StatefulAutonomous):
+class VictisAuto(AutonomousStateMachine):
     
     drive = swervedrive.SwerveDrive
     
     @state
     def failed(self):
         self.drive.debug(debug_modules = True)
-        self.next_state('done')
+        self.next_state('finish')
         
     @state
-    def done(self):
+    def finish(self):
         self.drive.flush()
-        super().done()
+        self.next_state('done')
         
