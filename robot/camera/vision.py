@@ -1,3 +1,9 @@
+'''
+    To run this without the robot (must have cscore installed on Linux):
+    
+        python3 -m cscore vision.py:main
+'''
+
 import cscore as cs
 import cv2
 import numpy as np
@@ -15,6 +21,7 @@ class VictisVision:
     STREAM_CV = False
     
     cv_enabled = ntproperty('/camera/control/cv_enabled', False)
+    dark_exposure = ntproperty('/camera/control/dark_exposure', 3)
     
     test = ntproperty('/camera/control/test', 0)
     
@@ -27,13 +34,21 @@ class VictisVision:
         #Cameras
         self.piston_cam = cs.UsbCamera("Piston Cam", 1)
         self.piston_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 20) #160 vs. 120
-        self.piston_cam.setExposureManual(35)
-        self.piston_cam.setBrightness(65)
-        test = self.piston_cam.getProperty("exposure_absolute")
-        print(self.piston_cam.getProperty("exposure_absolute"))
+        
+        self.piston_cam.setExposureAuto()
+        self.piston_cam.getProperty("backlight_compensation").set(5)
+        
+        #self.piston_cam.setExposureManual(35)
+        #self.piston_cam.setBrightness(65)
+        #test = self.piston_cam.getProperty("exposure_absolute")
+        #print(self.piston_cam.getProperty("exposure_absolute"))
         
         self.light_ring_cam = cs.UsbCamera("Light Ring Cam", 0)
         self.light_ring_cam.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, 320, 240, 20)
+        
+        # This only seems to affect automatic exposure mode
+        # -> higher value means it lets more light in when facing a big light
+        self.light_ring_cam.getProperty("backlight_compensation").set(5)
         
         #Image Processing
         self.cvsink = cs.CvSink("cvsink")
@@ -60,26 +75,27 @@ class VictisVision:
         self.processor = ImageProcessor()
     
     def process(self):
+        
+        exposure = None
+        
         while True:
-            #self.piston_cam.setExposureManual(35)
-            #self.piston_cam.setBrightness(74)
-            
             if self.cv_enabled:
-                #if self.getProperty('')
-                self.light_ring_cam.setExposureManual(3)
+                
+                if exposure != 'dark':
+                    self.light_ring_cam.setExposureManual(int(self.dark_exposure))
+                    exposure = 'dark'
                 
                 time, self.img = self.cvsink.grabFrame(self.img)
         
                 if time == 0:
-                    outputStream.notifyError(cvSink.getError())
+                    self.cvsource.notifyError(self.cvsink.getError())
                     continue
                 
                 self.img = self.processor.process_frame(self.img, time) 
             else:
-                #self.light_ring_cam.setExposureManual(35)
-                #self.light_ring_cam.setBrightness(52)
-                
-                
+                if exposure != 'auto':
+                    self.light_ring_cam.setExposureAuto()
+                    exposure = 'auto'
                 
                 self.nt.putBoolean('processor/gear_target_present', False)
                 
