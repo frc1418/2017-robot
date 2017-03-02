@@ -298,7 +298,13 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
     
     gear_picker = gearpicker.GearPicker
     
-    position = tunable('middle') #middle, left, right
+    # Position tunable should be one of four things
+    # 'middle_left' - middle gear place with left boiler
+    # 'middle_right' - middle gear place with right boiler 
+    # 'left' - left side gear place
+    # 'right' - right side gear place
+    position = tunable('middle_left')
+    
     shoot = tunable(True) #
     
     def initialize(self):
@@ -315,6 +321,12 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
         elif self.position == 'left':
             self.s_direction = -1
             self.position = 'side'
+        elif self.position == 'middle_left':
+            self.m_direction = 1
+            self.position = 'middle'
+        elif self.position == 'middle_right':
+            self.m_direction = -1
+            self.position = 'middle'
         
         #print(self._StateMachine__states)
         
