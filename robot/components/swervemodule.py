@@ -43,6 +43,7 @@ class SwerveModule:
         self.driveMotor = args[0]
         self.drive_inverted = kwargs.pop("inverted", False)
         self.driveMotor.setInverted(self.drive_inverted)
+        #self.driveMotor.setVoltageRampRate(20)
         
         self.rotateMotor = args[1]
         

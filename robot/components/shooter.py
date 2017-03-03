@@ -18,7 +18,7 @@ class Shooter(StateMachine):
         self.done()
 
     def shoot(self):
-        self.engage()
+        self.engage(force = True)
 
     def force_spin(self):
         self.shooter_speed = self.max_shooter_speed
@@ -28,6 +28,7 @@ class Shooter(StateMachine):
 
     @timed_state(duration=1.0, first=True, next_state='feed_shoot')
     def spinup(self):
+        print('spinning up')
         self.shooter_speed = self.max_shooter_speed
 
     @state
@@ -36,6 +37,7 @@ class Shooter(StateMachine):
         self.belt_speed = -1
 
     def execute(self):
+        print(self.belt_speed)
         self.belt_motor.set(self.belt_speed)
         self.shooter_motor.set(self.shooter_speed)
         self.belt_speed = 0

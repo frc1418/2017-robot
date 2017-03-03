@@ -35,10 +35,10 @@ class MiddleGearPlace(VictisAuto):
     
     # Distances
     # Warning: this is a field centric mode all positions are relative to starting position
-    m_out_y = tunable(6, subtable='middle')
+    m_out_y = tunable(6.3, subtable='middle')
     m_out_x = tunable(0, subtable='middle')
     
-    m_back_y = tunable(2, subtable='middle') # The cord that the robot backs off to before strafeing
+    m_back_y = tunable(4, subtable='middle') # The cord that the robot backs off to before strafeing
     
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
@@ -107,7 +107,7 @@ class MiddleGearPlace(VictisAuto):
         
         self.shooter.force_spin()
         
-        if self.x_ctrl.is_at_location() and self.y_ctrl.is_at_location():
+        if self.fc_x_ctrl.is_at_location() and self.fc_y_ctrl.is_at_location():
             self.next_state('middle_align_to_tower')
             
     @timed_state(duration = 5, next_state='failed')
@@ -173,6 +173,8 @@ class SideGearPlace(VictisAuto):
     s_out_x = tunable(0, subtable='side')
     s_out_angle = tunable(-60, subtable='side')
     
+    s_to_peg_distance = tunable(2, subtable='side')
+    
     s_peg_y = tunable(9.2, subtable='side') # TODO: Check this math (coverted from non field centric auto)
     s_peg_x = tunable(-1, subtable='side')
     
@@ -201,12 +203,13 @@ class SideGearPlace(VictisAuto):
         
     @timed_state(duration = 7, next_state='failed')
     def side_drive_to_gear(self):
-        self.y_ctrl.move_to(self.s_out_y)
-        self.x_ctrl.move_to(self.s_out_x)
+        self.fc_y_ctrl.move_to(self.s_out_y)
+        self.fc_x_ctrl.move_to(self.s_out_x)
         
-        self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
+        if self.fc_tracker.get_y() > self.s_out_y/2:
+            self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
-        if self.y_ctrl.is_at_location() and self.x_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location() and self.fc_x_ctrl.is_at_location():
             self.next_state('side_align_to_peg')
     
     @timed_state(duration = 7, next_state='failed')
@@ -222,18 +225,20 @@ class SideGearPlace(VictisAuto):
             self.next_state('side_align_to_peg')
     
     @timed_state(duration=3, next_state='side_try_place')
-    def side_drive_to_peg(self):
-        self.y_ctrl.move_to(self.s_peg_y)
-        self.x_ctrl.move_to(self.s_peg_x * self.s_direction) # POSSIBLE ERROR: x pos reaching location before y pos
+    def side_drive_to_peg(self, initial_call):
+        if initial_call:
+            self.tracker.enable()
+            self.tracker.reset()
+            
+        self.y_ctrl.move_to(self.s_to_peg_distance)
         self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
-        if self.y_ctrl.is_at_location() and self.x_ctrl.is_at_location():
+        if self.y_ctrl.is_at_location():
             self.next_state('side_drive_back')
             
     @timed_state(duration=1, next_state='side_drive_back')
     def side_try_place(self):
-        self.x_ctrl.move_to(self.s_peg_x)
-        self.y_ctrl.move_to(self.s_peg_y)
+        self.y_ctrl.move_to(self.s_to_peg_distance)
         self.drive.set_raw_rcw(-0.4 * self.s_direction)
         
         if self.y_ctrl.is_at_location():
@@ -242,12 +247,13 @@ class SideGearPlace(VictisAuto):
     @timed_state(duration=5, next_state='failed')
     def side_drive_back(self, initial_call):
         if initial_call:
+            self.tracker.reset()
             self.gear_picker._picker_state = 1
         
-        self.y_ctrl.move_to(self.s_back_y)
-        self.x_ctrl.move_to(self.s_back_x)
+        self.y_ctrl.move_to(-self.s_to_peg_distance)
+        self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
-        if self.y_ctrl.is_at_location() and self.x_ctrl.is_at_location():
+        if self.y_ctrl.is_at_location():
             self.next_state('transition')
     
     ############################################ 
@@ -260,13 +266,13 @@ class SideGearPlace(VictisAuto):
         
     @timed_state(duration=5, next_state='failed')
     def side_to_tower(self):
-        self.y_ctrl.move_to(self.s_tower_y)
-        self.x_ctrl.move_to(self.s_tower_x * self.s_direction)
+        self.fc_y_ctrl.move_to(self.s_tower_y)
+        self.fc_x_ctrl.move_to(self.s_tower_x * self.s_direction)
         self.moving_angle_ctrl.align_to(self.s_tower_angle * self.s_direction)
         
         self.shooter.force_spin()
         
-        if self.y_ctrl.is_at_location() and self.x_ctrl.is_at_location():
+        if self.fc_y_ctrl.is_at_location() and self.fc_x_ctrl.is_at_location():
             self.next_state('side_align_to_tower')
     
     @timed_state(duration = 7, next_state='failed')
@@ -301,18 +307,19 @@ class SideGearPlace(VictisAuto):
         
 class GearPlace(MiddleGearPlace, SideGearPlace):
     MODE_NAME = "Gear Place"
-    DEFAULT = False
+    DEFAULT = True
     DISABLED = False
     
     
     angle_ctrl = angle_controller.AngleController
     moving_angle_ctrl = angle_controller.MovingAngleController
+    
     x_ctrl = pos_controller.XPosController
     y_ctrl = pos_controller.YPosController
     
     gear_picker = gearpicker.GearPicker
     
-    position = tunable('middle') #middle, left, right
+    position = tunable('right') #middle, left, right
     shoot = tunable(True) #
     
     def initialize(self):
@@ -329,6 +336,12 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
         elif self.position == 'left':
             self.s_direction = -1
             self.position = 'side'
+        elif self.position == 'middle_left':
+            self.m_direction = 1
+            self.position = 'middle'
+        elif self.position == 'middle_right':
+            self.m_direction = -1
+            self.position = 'middle'
         
         #print(self._StateMachine__states)
         

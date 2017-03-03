@@ -129,12 +129,13 @@ class DriveStraightWithGyroTest(VictisAuto):
     
     drive = swervedrive.SwerveDrive
     fc_y_ctrl = FCYPosController
+    fc_x_ctrl = FCXPosController
     moving_angle_ctrl = MovingAngleController
     
     
     fc_tracker = FCPositionTracker
     
-    drive_distance_feet = tunable(5) #Feet
+    drive_distance_feet = tunable(-5) #Feet
     align_to = tunable(0) #Deg
         
     
@@ -146,9 +147,9 @@ class DriveStraightWithGyroTest(VictisAuto):
             self.fc_tracker.enable()
         
         self.moving_angle_ctrl.align_to(self.align_to)
-        self.fc_y_ctrl.move_to(self.drive_distance_feet)
+        self.fc_x_ctrl.move_to(self.drive_distance_feet)
         
-        if self.fc_y_ctrl.is_at_location():
+        if self.fc_x_ctrl.is_at_location():
             self.next_state('finish')
             
     @state

@@ -48,7 +48,7 @@ class MyRobot(magicbot.MagicRobot):
     pos_history = PositionHistory
     auto_align = AutoAlign
     
-    gamepad_mode = tunable(True)
+    gamepad_mode = tunable(False)
     
     def createObjects(self):
         """Create basic components (motor controllers, joysticks, etc.)"""
@@ -69,10 +69,10 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Drive motors
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.93, has_drive_encoder=True)
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.73, has_drive_encoder=True)
         self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.59, inverted = True)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.6)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=4.04, has_drive_encoder=True, inverted = True)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.58)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted = True)
 
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
@@ -92,6 +92,8 @@ class MyRobot(magicbot.MagicRobot):
         self.belt_motor = wpilib.spark.Spark(9)
 
         self.intake_motor = wpilib.VictorSP(8)
+        
+        self.shoot_button = toggle_button.TrueToggleButton(self.secondary_joystick, 3)
 
         # Pistons for gear picker
         self.picker = wpilib.DoubleSolenoid(6, 7)
@@ -125,7 +127,7 @@ class MyRobot(magicbot.MagicRobot):
     def autonomous(self):
         """Prepare for autonomous mode."""
         self.field_centric.set_raw_values = True
-        self.drive.allow_reverse = True
+        self.drive.allow_reverse = False
         self.drive.wait_for_align = True
         self.drive.threshold_input_vectors = True
         
@@ -208,9 +210,9 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.climb()
             
         # Shooter
-        if self.secondary_joystick.getRawButton(3):
+        if self.shoot_button.get():
             self.shooter.shoot()
-        else:
+        if self.shoot_button.get_released():
             self.shooter.stop()
             
         # Secondary driver gimble control

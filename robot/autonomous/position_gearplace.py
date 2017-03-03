@@ -16,7 +16,7 @@ from magicbot.magic_tunable import tunable
 class RightSideGearPlace(VictisAuto):
     'Place robot 15in from string 90deg to string'
     MODE_NAME = "Right side gear place"
-    DEFAULT = True
+    DEFAULT = False
     
     DIRECTION = 1
 

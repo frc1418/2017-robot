@@ -74,9 +74,7 @@ class PositionTracker:
         self.enabled = True
         
         if zero_position:
-            self._position['y'] = 0.0
-            self._position['x'] = 0.0
-            self._position['rcw'] = 0.0
+            self.reset()
     
     def disable(self, zero_position = False):
         self.enabled = False
@@ -90,6 +88,11 @@ class PositionTracker:
         self._position['y'] = 0.0
         self._position['x'] = 0.0
         self._position['rcw'] = 0.0
+        
+        self._zeros['front_left'] = self.fl_module.get_drive_encoder_distance()
+        self._zeros['rear_right'] = self.rr_module.get_drive_encoder_distance()
+        self._zeros['rear_left'] = self.rl_module.get_drive_encoder_distance()
+        self._zeros['front_right'] = self.fr_module.get_drive_encoder_distance()
         
     def get_x(self):
         return self._position['x']
@@ -150,12 +153,13 @@ class FCPositionTracker(PositionTracker):
         with wheels that 0 deg is forward'''
         #print(math.cos(theta-self.navx.yaw) * dist)
         theta = (theta - math.radians(self.navx.yaw)) % (2 * math.pi)
-        return math.cos(theta) * dist
+        return super().seperate_y(dist, theta)
     
     def seperate_x(self, dist, theta):
         '''This function seperates the movment in the x direction
         with wheels that 0 deg is forward'''
         theta = (theta - math.radians(self.navx.yaw)) % (2 * math.pi)
-        return math.sin(theta-self.navx.yaw) * dist
+        
+        return super().seperate_x(dist, theta)
         
         

@@ -1,4 +1,5 @@
 import wpilib
+
 from networktables.networktable import NetworkTable
 from networktables.util import ntproperty
 

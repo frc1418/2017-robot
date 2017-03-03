@@ -23,7 +23,7 @@ class XPosController(BasePIDComponent):
     def __init__(self):
         super().__init__(self.get_position, 'x_ctrl')
         
-        self.set_abs_output_range(0.16, 0.65)
+        self.set_abs_output_range(0.16, 0.8)
         #self.pid.setOutputRange(-1.0, 1.0)
     
     def get_position(self):
@@ -66,7 +66,7 @@ class YPosController(BasePIDComponent):
     def __init__(self):
         super().__init__(self.get_position, 'y_ctrl')  
         
-        self.set_abs_output_range(0.16, 0.65)   
+        self.set_abs_output_range(0.16, 0.8)   
     
     def get_position(self):
         return self.tracker.get_y() / 1.0
@@ -105,6 +105,7 @@ class FCXPosController(XPosController):
                 self.field_centric.set_strafe(0)
             else:
                 self.field_centric.set_strafe(self.rate)
+                #print(self.rate)
 
 class FCYPosController(YPosController):
     
@@ -123,3 +124,4 @@ class FCYPosController(YPosController):
                 self.field_centric.set_fwd(0)
             else:
                 self.field_centric.set_fwd(self.rate)
+                
