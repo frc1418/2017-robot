@@ -55,6 +55,7 @@ class DriveStraightTest(VictisAuto):
     @state
     def finish(self):
         self.tracker.disable()
+        self.done()
 
 class DriveLeftTest(VictisAuto):
     MODE_NAME = 'Drive_Left_Test'
@@ -85,6 +86,7 @@ class DriveLeftTest(VictisAuto):
     @state
     def finish(self):
         self.drive.disable_position_prediction()
+        self.done()
         
         
 class GyroTest(VictisAuto):
@@ -122,6 +124,7 @@ class GyroTest(VictisAuto):
         self.drive.wait_for_align = False
         self.drive.threshold_input_vectors = True
         self.drive.disable_position_prediction()
+        self.done()
 
 class DriveStraightWithGyroTest(VictisAuto):
     MODE_NAME = 'Drive_Straight_With_Gyro_Test'
@@ -159,6 +162,7 @@ class DriveStraightWithGyroTest(VictisAuto):
     @state
     def finish(self):
         self.fc_tracker.disable()
+        self.done()
 
 class AlignAndPlace(VictisAuto):
     MODE_NAME = 'Align_and_place'

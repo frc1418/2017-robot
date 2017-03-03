@@ -14,5 +14,5 @@ class VictisAuto(AutonomousStateMachine):
     @state
     def finish(self):
         self.drive.flush()
-        self.next_state('done')
+        self.done()
         

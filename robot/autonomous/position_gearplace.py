@@ -241,7 +241,7 @@ class MiddleGearPlace(VictisAuto):
         self.moving_angle_ctrl.align_to(0)
         
         if self.y_ctrl.is_at_location():
-            self.next_state('done')
+            self.next_state('finish')
     
     '''
     
