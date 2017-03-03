@@ -196,7 +196,7 @@ class SwerveDrive:
         #Does nothing if the values are lower than the input thresh
         if self.threshold_input_vectors:
             if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
-               self._requested_vectors['fwd'] = 0
+                self._requested_vectors['fwd'] = 0
             
             if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
                 self._requested_vectors['strafe'] = 0
@@ -210,7 +210,7 @@ class SwerveDrive:
             
         #print("Yaw: ", self.navx.yaw, self._requested_vectors)
 
-        ratio = math.sqrt((self.length ** 2)+(self.width ** 2))
+        ratio = math.hypot(self.length, self.width)
         # Velocities per quadrant
         leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
         rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
@@ -218,16 +218,16 @@ class SwerveDrive:
         rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-        fr_speed = math.sqrt((rightY ** 2) + (frontX ** 2))
+        fr_speed = math.hypot(rightY, frontX)
         fr_angle = math.degrees(math.atan2(frontX, rightY))
 
-        fl_speed = math.sqrt((leftY ** 2) + (frontX ** 2))
+        fl_speed = math.hypot(leftY, frontX)
         fl_angle = math.degrees(math.atan2(frontX, leftY))
 
-        rl_speed = math.sqrt((leftY ** 2) + (rearX ** 2))
+        rl_speed = math.hypot(leftY, rearX)
         rl_angle = math.degrees(math.atan2(rearX, leftY))
 
-        rr_speed = math.sqrt((rightY ** 2) + (rearX ** 2))
+        rr_speed = math.hypot(rightY, rearX)
         rr_angle = math.degrees(math.atan2(rearX, rightY))
 
         # Assigns the speeds and angles in dictionaries

@@ -103,7 +103,7 @@ class PositionTracker:
     def _calculate(self):
         encoders = 0
         
-        radius = math.sqrt(((self.length) ** 2)+((self.width) ** 2))
+        radius = math.hypot(self.length, self.width)
         
         x = 0
         y = 0
