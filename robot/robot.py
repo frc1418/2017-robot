@@ -92,8 +92,6 @@ class MyRobot(magicbot.MagicRobot):
         self.belt_motor = wpilib.spark.Spark(9)
 
         self.intake_motor = wpilib.VictorSP(8)
-        
-        self.shoot_button = toggle_button.TrueToggleButton(self.secondary_joystick, 3)
 
         # Pistons for gear picker
         self.picker = wpilib.DoubleSolenoid(6, 7)
@@ -210,9 +208,9 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.climb()
             
         # Shooter
-        if self.shoot_button.get():
+        if self.secondary_joystick.getRawButton(3):
             self.shooter.shoot()
-        if self.shoot_button.get_released():
+        else:
             self.shooter.stop()
             
         # Secondary driver gimble control

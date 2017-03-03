@@ -18,7 +18,7 @@ class Shooter(StateMachine):
         self.done()
 
     def shoot(self):
-        self.engage(force = True)
+        self.engage()
 
     def force_spin(self):
         self.shooter_speed = self.max_shooter_speed
@@ -37,7 +37,8 @@ class Shooter(StateMachine):
         self.belt_speed = -1
 
     def execute(self):
-        print(self.belt_speed)
+        super().execute()
+        
         self.belt_motor.set(self.belt_speed)
         self.shooter_motor.set(self.shooter_speed)
         self.belt_speed = 0
