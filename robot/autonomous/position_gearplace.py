@@ -7,6 +7,7 @@ from components import swervedrive, gearpicker, shooter
 from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.position_history import PositionHistory
+from controllers.position_tracker import PositionTracker
 
 import wpilib
 from networktables import NetworkTable
@@ -15,7 +16,7 @@ from magicbot.magic_tunable import tunable
 class RightSideGearPlace(VictisAuto):
     'Place robot 15in from string 90deg to string'
     MODE_NAME = "Right side gear place"
-    DEFAULT = True
+    DEFAULT = False
     
     DIRECTION = 1
 
@@ -26,6 +27,8 @@ class RightSideGearPlace(VictisAuto):
     y_ctrl = YPosController
     angle_ctrl = AngleController
     moving_angle_ctrl = MovingAngleController
+    
+    tracker = PositionTracker
     
     out_distance = tunable(7.5)
     rotate_to_angle = tunable(-60)
@@ -41,7 +44,7 @@ class RightSideGearPlace(VictisAuto):
             self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
-            self.drive.enable_position_prediction()
+            self.tracker.enable()
         
         self.y_ctrl.move_to(self.out_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -64,7 +67,7 @@ class RightSideGearPlace(VictisAuto):
     @timed_state(duration = 3, next_state='rcw_with_gear')
     def drive_to_gear(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.y_ctrl.move_to(self.to_gear_distance)
         self.moving_angle_ctrl.align_to(self.rotate_to_angle * self.DIRECTION)
@@ -92,7 +95,7 @@ class RightSideGearPlace(VictisAuto):
     @timed_state(duration = 5, next_state='failed')
     def drive_back(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.y_ctrl.move_to(self.drive_back_distance)
         self.moving_angle_ctrl.align_to(self.rotate_to_angle * self.DIRECTION)
@@ -111,7 +114,7 @@ class RightSideGearPlace(VictisAuto):
     @state
     def drive_past_line(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
         
         self.moving_angle_ctrl.align_to(0)
         self.y_ctrl.move_to(self.drive_past_line_distance)
@@ -166,6 +169,8 @@ class MiddleGearPlace(VictisAuto):
     angle_ctrl = AngleController
     moving_angle_ctrl = MovingAngleController
     
+    tracker = PositionTracker
+    
     out_distance = tunable(6)
     #drive_back_distance = tunable(-3)
     strafe_distance = tunable(8)
@@ -178,7 +183,7 @@ class MiddleGearPlace(VictisAuto):
             self.drive.field_centric = False
             self.gear_picker._picker_state = 2
             self.angle_ctrl.reset_angle()
-            self.drive.enable_position_prediction()
+            self.tracker.enable()
         
         self.y_ctrl.move_to(self.out_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -206,7 +211,7 @@ class MiddleGearPlace(VictisAuto):
     @timed_state(duration = 5, next_state='failed')
     def drive_back(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.y_ctrl.move_to(self.drive_back_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -219,7 +224,7 @@ class MiddleGearPlace(VictisAuto):
     @timed_state(duration = 6, next_state='failed')
     def strafe_distance(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.x_ctrl.move_to(self.drive_back_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -230,7 +235,7 @@ class MiddleGearPlace(VictisAuto):
     @timed_state(duration = 6, next_state='failed')
     def drive_past_line(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.y_ctrl.move_to(self.drive_past_line_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -260,7 +265,7 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     @timed_state(duration = 5, next_state='failed')
     def drive_back(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
             
         self.y_ctrl.move_to(self.drive_back_distance)
         self.moving_angle_ctrl.align_to(0)
@@ -271,7 +276,7 @@ class ShootMiddleGearPlace(MiddleGearPlace):
     @timed_state(duration = 6, next_state='failed')     
     def strafe_tower(self, initial_call):
         if initial_call:
-            self.drive.reset_position_prediction()
+            self.tracker.reset()
         
         
         self.x_ctrl.move_to(self.strafe_tower_distance)

@@ -21,8 +21,8 @@ class AngleController(BasePIDComponent):
     kD = tunable(0.0)
     kF = tunable(0.0)
     
-    kToleranceDegrees = tunable(1)
-    kIzone = tunable(1)
+    kToleranceDegrees = tunable(3)
+    kIzone = tunable(3)
     
     navx = navx.AHRS
     
