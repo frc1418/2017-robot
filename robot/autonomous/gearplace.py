@@ -370,6 +370,7 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
     @state
     def finish(self):
         self.drive.flush()
+        self.done()
         
     
 
