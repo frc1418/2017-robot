@@ -17,7 +17,7 @@ class SwerveDrive:
     snap_rotation_axes = ntproperty('/SmartDashboard/drive/drive/snap_rotation_axes', 8)
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.06)
     
-    rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 1)
+    rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 1)
     
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)    
@@ -75,6 +75,8 @@ class SwerveDrive:
         
         self.width = (22/12)/2
         self.length = (18.5/12)/2
+        
+        self.request_wheel_lock = False
         
     @property
     def chassis_dimension(self):
@@ -206,6 +208,17 @@ class SwerveDrive:
                     
             if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0: # Prevents a useless loop.
                 self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
+                
+                if self.request_wheel_lock:
+                    # This is intended to set the wheels in such a way that it
+                    # difficult to push the robot (intended for defence)
+                    self._requested_angles['front_right'] = -135
+                    self._requested_angles['front_left'] = -45
+                    self._requested_angles['rear_left'] = 45
+                    self._requested_angles['rear_right'] = 135
+                    
+                    self.request_wheel_lock = False
+                
                 return
             
         #print("Yaw: ", self.navx.yaw, self._requested_vectors)

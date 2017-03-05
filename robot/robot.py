@@ -161,7 +161,7 @@ class MyRobot(magicbot.MagicRobot):
         else:
             self.field_centric.move(x, y)
             self.drive.set_rcw(rcw)
-
+        
     def teleopPeriodic(self):
         """Do periodically while robot is in teleoperated mode."""
         
@@ -175,18 +175,26 @@ class MyRobot(magicbot.MagicRobot):
             if not self.field_centric_drive:
                 self.navx.reset()
             self.field_centric_drive = not self.field_centric_drive
-            
+        
+        if self.left_joystick.getRawButton(2):
+            self.drive.request_lock_wheels = True
+        
+        '''   
         if self.left_joystick.getRawButton(2):
             self.drive.xy_multiplier = 0.5
             self.drive.rotation_multiplier = 0.25
         else:
             self.drive.xy_multiplier = 1.0
-            self.drive.rotation_multiplier = 0.75
+            self.drive.rotation_multiplier = 0.75'''
             
         if self.right_joystick.getRawButton(4):
             self.drive.set_raw_strafe(0.25)
         elif self.right_joystick.getRawButton(5):
             self.drive.set_raw_strafe(-0.25)
+        if self.right_joystick.getRawButton(3):
+            self.drive.set_raw_fwd(0.25)
+        elif self.right_joystick.getRawButton(2):
+            self.drive.set_raw_fwd(-0.25)
             
         # Gear picker
         if self.pivot_toggle_button.get():
@@ -194,11 +202,12 @@ class MyRobot(magicbot.MagicRobot):
                 self.gear_picker.pivot_down()
             else:
                 self.gear_picker.pivot_up()
-                        
+        
+        ''''    
         if self.pivot_up_button.get():
             self.gear_picker.pivot_up()
         elif self.pivot_down_button.get():
-            self.gear_picker.pivot_down()
+            self.gear_picker.pivot_down()'''
 
         if self.right_trigger.get() or self.secondary_trigger.get():
             self.gear_picker.actuate_picker()
