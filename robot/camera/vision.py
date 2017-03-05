@@ -62,8 +62,8 @@ class VictisVision:
         self.piston_server.setSource(self.piston_cam)
         
         
-        self.ring_stream = cs.MjpegServer("ring server", 1182)
-        self.ring_stream.setSource(self.light_ring_cam)
+        #self.ring_stream = cs.MjpegServer("ring server", 1182)
+        #self.ring_stream.setSource(self.light_ring_cam)
         
         if self.STREAM_CV:
             self.cv_stream = cs.MjpegServer("cv stream", 1183)
