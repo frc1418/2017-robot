@@ -43,7 +43,7 @@ class MiddleGearPlace(VictisAuto):
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
     m_tower_x = tunable(-4, subtable='middle')
-    m_tower_angle = tunable(55, subtable='middle')
+    m_tower_angle = tunable(65, subtable='middle')
     
     def initialize(self):
         pass
@@ -169,9 +169,9 @@ class SideGearPlace(VictisAuto):
     
     # Distances
     # Warning: this is a field centric mode all positions are relative to starting position
-    s_out_y = tunable(7.7, subtable='side')
+    s_out_y = tunable(7.9, subtable='side')
     s_out_x = tunable(0, subtable='side')
-    s_out_angle = tunable(-60, subtable='side')
+    s_out_angle = tunable(-70, subtable='side')
     
     s_to_peg_distance = tunable(2, subtable='side')
     
