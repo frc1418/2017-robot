@@ -35,7 +35,7 @@ class MiddleGearPlace(VictisAuto):
     
     # Distances
     # Warning: this is a field centric mode all positions are relative to starting position
-    m_out_y = tunable(6.3, subtable='middle')
+    m_out_y = tunable(6.5, subtable='middle')
     m_out_x = tunable(0, subtable='middle')
     
     m_back_y = tunable(4, subtable='middle') # The cord that the robot backs off to before strafeing
@@ -169,7 +169,7 @@ class SideGearPlace(VictisAuto):
     
     # Distances
     # Warning: this is a field centric mode all positions are relative to starting position
-    s_out_y = tunable(7.5, subtable='side')
+    s_out_y = tunable(7.7, subtable='side')
     s_out_x = tunable(0, subtable='side')
     s_out_angle = tunable(-60, subtable='side')
     
@@ -224,7 +224,7 @@ class SideGearPlace(VictisAuto):
         if not self.angle_ctrl.is_aligned_to(self.s_out_angle * self.s_direction):
             self.next_state('side_align_to_peg')
     
-    @timed_state(duration=3, next_state='side_try_place')
+    @timed_state(duration= 2.5, next_state='side_try_place')
     def side_drive_to_peg(self, initial_call):
         if initial_call:
             self.tracker.enable()
