@@ -4,8 +4,8 @@
 			"w": 3.6,
 			"h": 3,
 			"starting_x": 25,
-			"starting_y": 25,
-			"starting_angle": 180
+            "starting_y": 16,
+            "starting_angle": 180
 		},
 		"analog": {
 			"0": "Rear Right Rotation Encoder",
@@ -42,7 +42,7 @@
 		"field": {
 			"w": 27,
 			"h": 27,
-			"px_per_ft": 10
+			"px_per_ft": 17
 		}
 	}
 }
