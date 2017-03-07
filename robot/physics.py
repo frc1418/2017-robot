@@ -4,6 +4,11 @@ from networktables.util import ntproperty
 import wpilib
 import ctre
 
+try:
+    from pyfrc.physics.visionsim import VisionSim
+except ImportError:
+    VisionSim = None
+
 
 class PhysicsEngine:
     
@@ -11,11 +16,28 @@ class PhysicsEngine:
     lr_degrees = ntproperty("/SmartDashboard/drive/rl_module/degrees", 0)
     rf_degrees = ntproperty("/SmartDashboard/drive/fr_module/degrees", 0)
     lf_degrees = ntproperty("/SmartDashboard/drive/fl_module/degrees", 0)
+    
+    target = ntproperty('/camera/target', [0.0, 0.0, float('inf')])
 
     def __init__(self, controller):
         self.controller = controller
 
         self.controller.add_device_gyro_channel('navxmxp_spi_4_angle')
+        
+        if VisionSim is not None:
+            targets = [
+                # right
+                VisionSim.Target(16, 12, 250, 20), # angle is 122.23
+                # middle
+                VisionSim.Target(18.5, 16, 295, 65), # angle is 180
+                # left
+                VisionSim.Target(16, 20, 340, 110), # angle is -142
+            ]
+            
+            self.vision = VisionSim(targets, 61.0,
+                                    1.5, 15, 15)
+        else:
+            self.vision = None
 
 
 
@@ -78,6 +100,13 @@ class PhysicsEngine:
             self.controller.vector_drive(vx, vy, vw, tm_diff)
         except:
             pass
+            
+        if self.vision:
+            x, y, angle = self.controller.get_position()
+            
+            data = self.vision.compute(now, x, y, angle)
+            if data is not None:
+                self.target = data[0][:3]
         
         
         
