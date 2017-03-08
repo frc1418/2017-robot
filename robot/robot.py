@@ -188,13 +188,13 @@ class MyRobot(magicbot.MagicRobot):
             self.drive.rotation_multiplier = 0.75'''
             
         if self.right_joystick.getRawButton(4):
-            self.drive.set_raw_strafe(0.25)
+            self.drive.set_raw_strafe(0.35)
         elif self.right_joystick.getRawButton(5):
-            self.drive.set_raw_strafe(-0.25)
+            self.drive.set_raw_strafe(-0.35)
         if self.right_joystick.getRawButton(3):
-            self.drive.set_raw_fwd(0.25)
+            self.drive.set_raw_fwd(0.35)
         elif self.right_joystick.getRawButton(2):
-            self.drive.set_raw_fwd(-0.25)
+            self.drive.set_raw_fwd(-0.35)
             
         # Gear picker
         if self.pivot_toggle_button.get():
