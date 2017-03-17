@@ -177,7 +177,7 @@ class MyRobot(magicbot.MagicRobot):
             self.field_centric_drive = not self.field_centric_drive
         
         if self.left_joystick.getRawButton(2):
-            self.drive.request_lock_wheels = True
+            self.drive.request_wheel_lock = True
         
         '''   
         if self.left_joystick.getRawButton(2):
