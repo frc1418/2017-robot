@@ -25,7 +25,6 @@ from magicbot.magic_tunable import tunable
 
 class MyRobot(magicbot.MagicRobot):
 
-    drive = swervedrive.SwerveDrive
     shooter = shooter.Shooter
     gear_picker = gearpicker.GearPicker
     climber = climber.Climber
@@ -42,11 +41,13 @@ class MyRobot(magicbot.MagicRobot):
     fc_y_ctrl = FCYPosController
     fc_x_ctrl = FCXPosController
     
+    auto_align = AutoAlign
+    
     angle_ctrl = AngleController
     moving_angle_ctrl = MovingAngleController
     
     pos_history = PositionHistory
-    auto_align = AutoAlign
+    drive = swervedrive.SwerveDrive
     
     gamepad_mode = tunable(False)
     
