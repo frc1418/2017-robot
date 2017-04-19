@@ -12,9 +12,9 @@ class Climber:
         self.nt = NetworkTable.getTable("SmartDashboard")
          
          
-    def climb(self):
-        self._motor1_speed = 1
-        self._motor2_speed = -1
+    def climb(self, speed):
+        self._motor1_speed = speed
+        self._motor2_speed = speed
 
     def execute(self):
         self.climb_motor1.set(self._motor1_speed)

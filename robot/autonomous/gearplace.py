@@ -43,7 +43,7 @@ class MiddleGearPlace(VictisAuto):
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
     m_tower_x = tunable(-4, subtable='middle')
-    m_tower_angle = tunable(55, subtable='middle')
+    m_tower_angle = tunable(65, subtable='middle')
     
     def initialize(self):
         pass
@@ -169,11 +169,11 @@ class SideGearPlace(VictisAuto):
     
     # Distances
     # Warning: this is a field centric mode all positions are relative to starting position
-    s_out_y = tunable(7.7, subtable='side')
+    s_out_y = tunable(7.9, subtable='side')
     s_out_x = tunable(0, subtable='side')
-    s_out_angle = tunable(-60, subtable='side')
+    s_out_angle = tunable(-70, subtable='side')
     
-    s_to_peg_distance = tunable(2, subtable='side')
+    s_to_peg_distance = tunable(2.5, subtable='side')
     
     s_peg_y = tunable(9.2, subtable='side') # TODO: Check this math (coverted from non field centric auto)
     s_peg_x = tunable(-1, subtable='side')
@@ -183,7 +183,12 @@ class SideGearPlace(VictisAuto):
     
     s_tower_y = tunable(5.7, subtable='side')
     s_tower_x = tunable(1, subtable='side')
-    s_tower_angle = tunable(-40, subtable='side')
+    s_tower_angle = tunable(-40, subtable='side')'''
+    
+    s_drive_past_tower = tunable(False, subtable='side')
+    s_past_tower_y = tunable(12, subtable='side')
+    s_past_tower_x = tunable(0, subtable='side')
+    s_past_tower_angle = tunable(-180, subtable='side')
     
     def initialize(self):
         pass
@@ -206,8 +211,10 @@ class SideGearPlace(VictisAuto):
         self.fc_y_ctrl.move_to(self.s_out_y)
         self.fc_x_ctrl.move_to(self.s_out_x)
         
-        if self.fc_tracker.get_y() > self.s_out_y/2:
+        if self.fc_tracker.get_y() > self.s_out_y/2 and False:
             self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
+        else:
+            self.moving_angle_ctrl.align_to(0)
         
         if self.fc_y_ctrl.is_at_location() and self.fc_x_ctrl.is_at_location():
             self.next_state('side_align_to_peg')
@@ -224,7 +231,7 @@ class SideGearPlace(VictisAuto):
         if not self.angle_ctrl.is_aligned_to(self.s_out_angle * self.s_direction):
             self.next_state('side_align_to_peg')
     
-    @timed_state(duration= 2.5, next_state='side_try_place')
+    @timed_state(duration= 3, next_state='side_try_place')
     def side_drive_to_peg(self, initial_call):
         if initial_call:
             self.tracker.enable()
@@ -254,7 +261,20 @@ class SideGearPlace(VictisAuto):
         self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
         if self.y_ctrl.is_at_location():
+            if not self.s_drive_past_tower:
+                self.next_state('transition')
+            else:
+                self.next_state('side_drive_past_tower')
+                
+    @timed_state(duration=5, next_state='failed')
+    def side_drive_past_tower(self):
+        self.fc_y_ctrl.move_to(self.s_past_tower_y)
+        self.fc_x_ctrl.move_to(self.s_past_tower_x)
+        self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
+        
+        if self.fc_y_ctrl.is_at_location():
             self.next_state('transition')
+        
     
     ############################################ 
     # This portion of the code is for shooting #
@@ -324,9 +344,9 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
     # 'middle_right' - middle gear place with right boiler 
     # 'left' - left side gear place
     # 'right' - right side gear place
-    position = tunable('middle_left')
+    position = tunable('left')
     
-    shoot = tunable(True) #
+    shoot = tunable(False) #
     
     def initialize(self):
         MiddleGearPlace.initialize(self)

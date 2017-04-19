@@ -65,13 +65,12 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_joystick = wpilib.Joystick(2)
 
         # Triggers and buttons
-        self.right_trigger = ButtonDebouncer(self.right_joystick, 1)
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Drive motors
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.73, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=0.59, inverted = True)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.58)
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=3.58, has_drive_encoder=True)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.43, inverted = True)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.55)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted = True)
 
         # Drive control
@@ -156,6 +155,9 @@ class MyRobot(magicbot.MagicRobot):
         
     
     def move(self, x, y, rcw):
+        if self.right_joystick.getRawButton(1):
+                rcw *= 0.75
+                
         if not self.field_centric_drive or self.left_joystick.getRawButton(1):
             self.drive.move(x, y, rcw)
         else:
@@ -177,7 +179,7 @@ class MyRobot(magicbot.MagicRobot):
             self.field_centric_drive = not self.field_centric_drive
         
         if self.left_joystick.getRawButton(2):
-            self.drive.request_lock_wheels = True
+            self.drive.request_wheel_lock = True
         
         '''   
         if self.left_joystick.getRawButton(2):
@@ -192,9 +194,9 @@ class MyRobot(magicbot.MagicRobot):
         elif self.right_joystick.getRawButton(5):
             self.drive.set_raw_strafe(-0.25)
         if self.right_joystick.getRawButton(3):
-            self.drive.set_raw_fwd(0.25)
+            self.drive.set_raw_fwd(0.35)
         elif self.right_joystick.getRawButton(2):
-            self.drive.set_raw_fwd(-0.25)
+            self.drive.set_raw_fwd(-0.35)
             
         # Gear picker
         if self.pivot_toggle_button.get():
@@ -209,12 +211,14 @@ class MyRobot(magicbot.MagicRobot):
         elif self.pivot_down_button.get():
             self.gear_picker.pivot_down()'''
 
-        if self.right_trigger.get() or self.secondary_trigger.get():
+        if self.secondary_trigger.get():
             self.gear_picker.actuate_picker()
 
         # Climber
         if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
-            self.climber.climb()
+            self.climber.climb(-1)
+        if self.secondary_joystick.getRawButton(6):
+            self.climber.climb(-0.7)
             
         # Shooter
         if self.secondary_joystick.getRawButton(3):

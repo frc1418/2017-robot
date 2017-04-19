@@ -18,7 +18,7 @@ class SwerveDrive:
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.06)
     
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
-    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 1)
+    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.85)
     
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)    
     
@@ -212,10 +212,11 @@ class SwerveDrive:
                 if self.request_wheel_lock:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
-                    self._requested_angles['front_right'] = -135
-                    self._requested_angles['front_left'] = -45
-                    self._requested_angles['rear_left'] = 45
-                    self._requested_angles['rear_right'] = 135
+                    
+                    self._requested_angles['front_right'] = -45
+                    self._requested_angles['front_left'] = 45
+                    self._requested_angles['rear_left'] = -45
+                    self._requested_angles['rear_right'] = 45
                     
                     self.request_wheel_lock = False
                 
