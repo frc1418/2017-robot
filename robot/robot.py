@@ -65,7 +65,6 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_joystick = wpilib.Joystick(2)
 
         # Triggers and buttons
-        self.right_trigger = ButtonDebouncer(self.right_joystick, 1)
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Drive motors
@@ -156,6 +155,9 @@ class MyRobot(magicbot.MagicRobot):
         
     
     def move(self, x, y, rcw):
+        if self.right_joystick.getRawButton(1):
+                rcw *= 0.75
+                
         if not self.field_centric_drive or self.left_joystick.getRawButton(1):
             self.drive.move(x, y, rcw)
         else:
@@ -209,7 +211,7 @@ class MyRobot(magicbot.MagicRobot):
         elif self.pivot_down_button.get():
             self.gear_picker.pivot_down()'''
 
-        if self.right_trigger.get() or self.secondary_trigger.get():
+        if self.secondary_trigger.get():
             self.gear_picker.actuate_picker()
 
         # Climber
