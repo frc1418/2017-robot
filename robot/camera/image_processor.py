@@ -5,6 +5,8 @@ import math
 from networktables import NetworkTable
 from networktables.util import ntproperty
 
+INF = float('inf')
+
 class ImageProcessor:
     
     # Values for the lifecam-3000
@@ -38,6 +40,9 @@ class ImageProcessor:
     draw_contours = ntproperty('/camera/processor/draw_contours', False)
     draw_gear_patch = ntproperty('/camera/processor/draw_gear_patch', False)
     draw_gear_target = ntproperty('/camera/processor/draw_gear_target', True)
+    
+    # found, time, angle
+    target = ntproperty('/camera/target', [0.0, 0.0, INF, INF])
     
     def __init__(self):
         self.size = None
@@ -169,6 +174,8 @@ class ImageProcessor:
         
         # Breaks out of loop if no complete targets
         if len(self.full_targets) == 0:
+            self.target = (0, time, INF, INF)
+            
             self.nt.putBoolean('gear_target_present', False)
             return self.out
         
@@ -251,9 +258,8 @@ class ImageProcessor:
             #print("Skew %s" % skew)    
             self.nt.putNumber('gear_target_skew', skew)
             
-            target = (angle, skew, time)
+            self.target = (1, time, angle, skew)
         
-            self.nt.putNumberArray('target', target)
             
         self.nt.putNumber('gear_target_angle', angle)
         self.nt.putNumber('gear_target_height', height)

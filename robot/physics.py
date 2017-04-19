@@ -35,7 +35,8 @@ class PhysicsEngine:
             ]
             
             self.vision = VisionSim(targets, 61.0,
-                                    1.5, 15, 15)
+                                    1.5, 15, 15,
+                                    physics_controller=controller)
         else:
             self.vision = None
 
@@ -106,7 +107,10 @@ class PhysicsEngine:
             
             data = self.vision.compute(now, x, y, angle)
             if data is not None:
-                self.target = data[0][:3]
+                
+                # found, time, angle, skew
+                data = data[0]
+                self.target = (data[0], data[1], data[2], float('inf')) #data[0][:3]
         
         
         
