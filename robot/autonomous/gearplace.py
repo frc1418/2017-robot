@@ -183,7 +183,12 @@ class SideGearPlace(VictisAuto):
     
     s_tower_y = tunable(5.7, subtable='side')
     s_tower_x = tunable(1, subtable='side')
-    s_tower_angle = tunable(-40, subtable='side')
+    s_tower_angle = tunable(-40, subtable='side')'''
+    
+    s_drive_past_tower = tunable(False, subtable='side')
+    s_past_tower_y = tunable(12, subtable='side')
+    s_past_tower_x = tunable(0, subtable='side')
+    s_past_tower_angle = tunable(-180, subtable='side')
     
     def initialize(self):
         pass
@@ -256,7 +261,20 @@ class SideGearPlace(VictisAuto):
         self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         
         if self.y_ctrl.is_at_location():
+            if not self.s_drive_past_tower:
+                self.next_state('transition')
+            else:
+                self.next_state('side_drive_past_tower')
+                
+    @timed_state(duration=5, next_state='failed')
+    def side_drive_past_tower(self):
+        self.fc_y_ctrl.move_to(self.s_past_tower_y)
+        self.fc_x_ctrl.move_to(self.s_past_tower_x)
+        self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
+        
+        if self.fc_y_ctrl.is_at_location():
             self.next_state('transition')
+        
     
     ############################################ 
     # This portion of the code is for shooting #
@@ -326,7 +344,7 @@ class GearPlace(MiddleGearPlace, SideGearPlace):
     # 'middle_right' - middle gear place with right boiler 
     # 'left' - left side gear place
     # 'right' - right side gear place
-    position = tunable('middle_left')
+    position = tunable('left')
     
     shoot = tunable(False) #
     
