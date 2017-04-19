@@ -183,7 +183,7 @@ class SideGearPlace(VictisAuto):
     
     s_tower_y = tunable(5.7, subtable='side')
     s_tower_x = tunable(1, subtable='side')
-    s_tower_angle = tunable(-40, subtable='side')'''
+    s_tower_angle = tunable(-40, subtable='side')
     
     s_drive_past_tower = tunable(False, subtable='side')
     s_past_tower_y = tunable(12, subtable='side')
