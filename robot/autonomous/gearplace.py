@@ -38,7 +38,7 @@ class MiddleGearPlace(VictisAuto):
     m_out_y = tunable(6.5, subtable='middle')
     m_out_x = tunable(0, subtable='middle')
     
-    m_back_y = tunable(4, subtable='middle') # The cord that the robot backs off to before strafeing
+    m_back_y = tunable(3, subtable='middle') # The cord that the robot backs off to before strafeing
     
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
@@ -256,6 +256,7 @@ class SideGearPlace(VictisAuto):
         if initial_call:
             self.tracker.reset()
             self.gear_picker._picker_state = 1
+            self.gear_picker.pivot_down()
         
         self.y_ctrl.move_to(-self.s_to_peg_distance)
         self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
