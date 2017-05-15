@@ -25,29 +25,39 @@ class GearPicker:
         pass
 
     def actuate_picker(self):
-        """Switch picker state."""
+        """
+        Switch picker state.
+        """
         if self._picker_state == 1:
             self._picker_state = 2
         else:
             self._picker_state = 1
 
     def pivot_up(self):
-        """Pivot picker arm up."""
+        """
+        Pivot picker arm up.
+        """
         self._pivot_state = 1
         self.intake_on = True
 
     def pivot_down(self):
-        """Pivot picker arm down."""
+        """
+        Pivot picker arm down.
+        """
         self._pivot_state = 2
         self.intake_on = False
 
     def update_sd(self):
-        """Put refreshed values to SmartDashboard."""
-        self.sd.putBoolean("picker/intake_on", self.intake_on)
+        """
+        Put refreshed values to SmartDashboard.
+        """
+        self.sd.putBoolean('picker/intake_on', self.intake_on)
         self.sd.putBoolean('picker/pivot_state', self.pivot.get() == 1)
 
     def execute(self):
-        """Repeating code."""
+        """
+        Repeating code.
+        """
         self.update_sd()
         self.picker.set(self._picker_state)
         self.pivot.set(self._pivot_state)

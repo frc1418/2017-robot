@@ -3,6 +3,7 @@ import wpilib
 from networktables.networktable import NetworkTable
 from networktables.util import ntproperty
 
+
 class Gimbal:
     # Yaw = left/right, pitch = up/down
     gimbal_yaw = wpilib.Servo
@@ -18,10 +19,14 @@ class Gimbal:
         pass
 
     def execute(self):
-        """Repeating code."""
+        """
+        Repeating code.
+        """
         self.gimbal_yaw.set(self.yaw)
         self.gimbal_pitch.set(self.pitch)
 
     def update_sd(self, name):
-        """Put refreshed values to SmartDashboard."""
+        """
+        Put refreshed values to SmartDashboard.
+        """
         pass

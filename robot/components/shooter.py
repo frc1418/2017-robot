@@ -3,6 +3,7 @@ import wpilib
 import ctre
 from magicbot.magic_tunable import tunable
 
+
 class Shooter(StateMachine):
     belt_motor = wpilib.spark.Spark
     shooter_motor = ctre.CANTalon
@@ -38,7 +39,7 @@ class Shooter(StateMachine):
 
     def execute(self):
         super().execute()
-        
+
         self.belt_motor.set(self.belt_speed)
         self.shooter_motor.set(self.shooter_speed)
         self.belt_speed = 0
