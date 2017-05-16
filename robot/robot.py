@@ -218,7 +218,13 @@ class MyRobot(magicbot.MagicRobot):
         if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
             self.climber.climb(-1)
         if self.secondary_joystick.getRawButton(6):
-            self.climber.climb(-0.7)
+            self.climber.climb(-0.5)
+            
+            
+        if self.secondary_joystick.getRawButton(5):
+            self.light_controller.set(1)
+        else:
+            self.light_controller.set(0)
             
         # Shooter
         if self.secondary_joystick.getRawButton(3):
