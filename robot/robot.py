@@ -71,17 +71,10 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Drive motors
-<<<<<<< HEAD
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.85, has_drive_encoder=True)
         self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.92, inverted = True)
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.59)
         self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted = True)
-=======
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=3.58, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.43, inverted=True)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.55)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted=True)
->>>>>>> init-cleanup
 
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
@@ -220,7 +213,6 @@ class MyRobot(magicbot.MagicRobot):
         if self.left_joystick.getRawButton(3) or self.secondary_joystick.getRawButton(4):
             self.climber.climb(-1)
         if self.secondary_joystick.getRawButton(6):
-<<<<<<< HEAD
             self.climber.climb(-0.5)
             
             
@@ -229,10 +221,6 @@ class MyRobot(magicbot.MagicRobot):
         else:
             self.light_controller.set(0)
             
-=======
-            self.climber.climb(-0.7)
-
->>>>>>> init-cleanup
         # Shooter
         if self.secondary_joystick.getRawButton(3):
             self.shooter.shoot()
