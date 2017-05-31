@@ -155,7 +155,6 @@ class SwerveModule:
     def is_aligned(self):
         if abs(self._pid_controller.getError()) < 0.1:
             return True
-        print(self.sd_prefix, 'Voltage Error', abs(self._pid_controller.getError()))
         return False
 
     def _set_deg(self, value):

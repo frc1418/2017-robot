@@ -77,10 +77,6 @@ class AutoAlign(StateMachine):
         if self._move_to_position():
             self.next_state('done')
 
-    @state
-    def end(self):
-        pass
-
     def done(self):
         super().done()
 

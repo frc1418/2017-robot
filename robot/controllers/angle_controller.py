@@ -7,7 +7,7 @@ from magicbot import tunable
 from robotpy_ext.common_drivers import navx
 
 from components.swervedrive import SwerveDrive
-from .my_pid_base import BasePIDComponent
+from .base_pid_controller import BasePIDComponent
 
 
 class AngleController(BasePIDComponent):
@@ -74,7 +74,6 @@ class AngleController(BasePIDComponent):
         return abs(error) < self.kToleranceDegrees
 
     def is_aligned_to(self, setpoint):
-
         angle = self.get_angle()
 
         # compensate for wraparound (code from PIDController)

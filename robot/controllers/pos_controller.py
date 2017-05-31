@@ -3,7 +3,7 @@ import math
 from magicbot import tunable
 
 from components import swervedrive
-from .my_pid_base import BasePIDComponent
+from .base_pid_controller import BasePIDComponent
 from . import field_centric, position_tracker
 
 
