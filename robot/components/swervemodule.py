@@ -1,58 +1,51 @@
-import wpilib
-import math
-
 from networktables import NetworkTable
-from networktables.util import ntproperty
+import math
+import wpilib
 
 
 MAX_VOLTAGE = 5
 MAX_TICK = 4096
 MAX_DEG = 360
 
-WHEEL_DIAMETER = 4/12  # 4 Inches
+WHEEL_DIAMETER = 4 / 12  # 4 Inches
 WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * math.pi
 WHEEL_TICKS_PER_REV = 55000
 
 
 class SwerveModule:
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, driveMotor, rotateMotor, encoder, SDPrefix='SwerveModule', inverted=False, zero=0.0, allow_reverse=True, has_drive_encoder=False):
         """
         Swerve drive module was written for a swerve drive train that uses absolute encoders for tracking wheel rotation.
 
-        When positional arguments are used:
             :param driveMotor: Motor object
             :param rotateMotor: Motor object
             :param encoder: AnalogInput wpilib object
-
-        When key word arguments are used:
             :param encoderPort: analog in port number of Absolute Encoder
-
             :param SDPrefix: a string used to differentiate modules when debugging
             :param zero: The default zero for the encoder
             :param inverted: boolean to invert the wheel rotation
-
             :param allow_reverse: If true allows wheels to spin backwards instead of rotating
 
         """
 
         # SmartDashboard
         self.sd = NetworkTable.getTable('SmartDashboard')
-        self.sd_prefix = kwargs.pop('SDPrefix', False)
+        self.sd_prefix = SDPrefix
 
         # Motors
-        self.driveMotor = args[0]
-        self.drive_inverted = kwargs.pop('inverted', False)
+        self.driveMotor = driveMotor
+        self.drive_inverted = inverted
         self.driveMotor.setInverted(self.drive_inverted)
 
-        self.rotateMotor = args[1]
+        self.rotateMotor = rotateMotor
 
         self._requested_voltage = 0  # Angle in voltage form
         self._requested_speed = 0
 
         # Encoder
-        self.encoder = args[2]
-        self.encoder_zero = kwargs.pop('zero', 0.0)
+        self.encoder = encoder
+        self.encoder_zero = zero
 
         # PID
         self._pid_controller = wpilib.PIDController(1.5, 0.0, 0.0, self.encoder, self.rotateMotor)
@@ -61,10 +54,10 @@ class SwerveModule:
         self._pid_controller.enable()
 
         # State variables
-        self.allow_reverse = kwargs.pop('allow_reverse', True)
+        self.allow_reverse = allow_reverse
         self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False)
 
-        self.has_drive_encoder = kwargs.pop('has_drive_encoder', False)
+        self.has_drive_encoder = has_drive_encoder
 
     def set_pid(self, p, i, d):
         self._pid_controller.setPID(p, i, d)
@@ -96,11 +89,11 @@ class SwerveModule:
         :param voltage: a voltage value between 0 and 5
         """
 
-        deg = (voltage/5)*360
+        deg = (voltage / 5) * 360
         deg = deg
 
         if deg < 0:
-            deg = 360+deg;
+            deg = 360 + deg
 
         return deg
 
@@ -112,7 +105,7 @@ class SwerveModule:
         :param voltage: a voltage value between 0 and 5
         """
 
-        rad = (voltage/5)*2*math.pi
+        rad = (voltage / 5) * 2 * math.pi
         return rad
 
     @staticmethod
@@ -123,7 +116,7 @@ class SwerveModule:
         :param voltage: a voltage value between 0 and 5
         """
 
-        return (voltage/5)*4050
+        return (voltage / 5) * 4050
 
     @staticmethod
     def degree_to_voltage(degree):
@@ -133,7 +126,7 @@ class SwerveModule:
         :param degree: a degree value between 0 and 360
         """
 
-        return (degree/360)*5
+        return (degree / 360) * 5
 
     @staticmethod
     def tick_to_voltage(tick):
@@ -143,7 +136,7 @@ class SwerveModule:
         :param tick: a tick value between 0 and 4050
         """
 
-        return (tick/4050)*5
+        return (tick / 4050) * 5
 
     def zero_encoder(self):
         """
@@ -163,7 +156,7 @@ class SwerveModule:
         Intended to be used only by the move function.
         """
 
-        self._requested_voltage = ((self.degree_to_voltage(value)+self.encoder_zero) % 5)
+        self._requested_voltage = ((self.degree_to_voltage(value) + self.encoder_zero) % 5)
 
     def move(self, speed, deg):
         """
@@ -172,7 +165,7 @@ class SwerveModule:
         deg %= 360  # Prevent values past 360
 
         if self.allow_reverse:
-            if abs( deg - self.voltage_to_degrees(self.get_voltage()) ) > 90:
+            if abs(deg - self.voltage_to_degrees(self.get_voltage())) > 90:
                 speed *= -1
                 deg += 180
 
@@ -214,7 +207,7 @@ class SwerveModule:
             self.sd.putNumber('drive/%s/requested_speed' % self.sd_prefix, self._requested_speed)
             self.sd.putNumber('drive/%s/raw voltage' % self.sd_prefix, self.encoder.getVoltage())  # DO NOT USE self.get_voltage() here
             self.sd.putNumber('drive/%s/average voltage' % self.sd_prefix, self.encoder.getAverageVoltage())
-            self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
+            self.sd.putNumber('drive/%s/encoder zero' % self.sd_prefix, self.encoder_zero)
 
             self.sd.putNumber('drive/%s/PID' % self.sd_prefix, self._pid_controller.get())
             self.sd.putNumber('drive/%s/PID Error' % self.sd_prefix, self._pid_controller.getError())

@@ -1,8 +1,5 @@
-import math
-
 from networktables.util import ntproperty
-import wpilib
-import ctre
+import math
 
 
 class PhysicsEngine:
@@ -22,7 +19,6 @@ class PhysicsEngine:
         self.rl_rotate_encoder = 0
         self.fr_rotate_encoder = 0
         self.fl_rotate_encoder = 0
-
 
     def update_sim(self, hal_data, now, tm_diff):
         """
@@ -48,7 +44,7 @@ class PhysicsEngine:
             hal_data['analog_in'][2]['avg_voltage'] = self.rl_rotate_encoder
             hal_data['analog_in'][1]['avg_voltage'] = self.fr_rotate_encoder
             hal_data['analog_in'][3]['avg_voltage'] = self.fl_rotate_encoder
-        except:
+        except Exception:
             pass
 
         try:
@@ -68,7 +64,7 @@ class PhysicsEngine:
 
             vx, vy, vw = four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, self.lr_degrees, self.rr_degrees, self.lf_degrees, self.rf_degrees, x_wheelbase=3, y_wheelbase=3.6, speed=9)
             self.controller.vector_drive(vx, vy, vw, tm_diff)
-        except:
+        except Exception:
             pass
 
 
@@ -106,7 +102,7 @@ def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angl
     rf_rad = rf_angle * (math.pi / 180)
 
     # Calculate wheelbase radius
-    wheelbase_radius = math.hypot(x_wheelbase/2.0, y_wheelbase/2.0)
+    wheelbase_radius = math.hypot(x_wheelbase / 2.0, y_wheelbase / 2.0)
 
     # Calculates the Vx and Vy components
     # Sin and Cos inverted because forward is 0 on swerve wheels

@@ -1,5 +1,5 @@
-import cv2
 from image_processor import ImageProcessor
+import cv2
 
 processor = ImageProcessor()
 

@@ -1,14 +1,12 @@
-from magicbot.state_machine import state, timed_state
+from .base_auto import VictisAuto
 from components import swervedrive
-from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController
 from controllers.angle_controller import AngleController, MovingAngleController
+from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController
 from controllers.position_history import PositionHistory
 from controllers.position_tracker import PositionTracker, FCPositionTracker
-from .base_auto import VictisAuto
-
-import wpilib
-from networktables import NetworkTable
 from magicbot.magic_tunable import tunable
+from magicbot.state_machine import state, timed_state
+from networktables import NetworkTable
 
 
 class DriveTest(VictisAuto):

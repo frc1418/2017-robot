@@ -1,6 +1,5 @@
-from magicbot.state_machine import state, AutonomousStateMachine
-
 from components import swervedrive
+from magicbot.state_machine import state, AutonomousStateMachine
 
 
 class VictisAuto(AutonomousStateMachine):

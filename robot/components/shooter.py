@@ -1,7 +1,7 @@
 from magicbot import StateMachine, timed_state, state
-import wpilib
-import ctre
 from magicbot.magic_tunable import tunable
+import ctre
+import wpilib
 
 
 class Shooter(StateMachine):

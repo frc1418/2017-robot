@@ -1,13 +1,8 @@
 
-import math
-
-import hal
-
+from .base_pid_controller import BasePIDComponent
+from components.swervedrive import SwerveDrive
 from magicbot import tunable
 from robotpy_ext.common_drivers import navx
-
-from components.swervedrive import SwerveDrive
-from .base_pid_controller import BasePIDComponent
 
 
 class AngleController(BasePIDComponent):
@@ -52,26 +47,7 @@ class AngleController(BasePIDComponent):
         self.setpoint = angle
 
     def is_aligned(self):
-        """
-        Return True if robot is pointing at specified angle.
-
-        Note: Always returns False when move_at_angle is not being called.
-        """
-        if not self.enabled:
-            return False
-
-        angle = self.get_angle()
-        setpoint = self.setpoint
-
-        # compensate for wraparound (code from PIDController)
-        error = setpoint - angle
-        if abs(error) > 180.0:
-            if error > 0:
-                error = error - 360.0
-            else:
-                error = error + 360.0
-
-        return abs(error) < self.kToleranceDegrees
+        return self.is_aligned_to(self.setpoint)
 
     def is_aligned_to(self, setpoint):
         angle = self.get_angle()

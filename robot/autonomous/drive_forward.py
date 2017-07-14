@@ -1,10 +1,8 @@
 from .base_auto import VictisAuto
-
 from components import swervedrive, gearpicker, shooter
-from controllers import angle_controller, pos_controller, position_history, position_tracker
-
-from magicbot.state_machine import timed_state, state, AutonomousStateMachine
+from controllers import angle_controller, pos_controller, position_tracker
 from magicbot.magic_tunable import tunable
+from magicbot.state_machine import timed_state
 
 
 class SideGearPlace(VictisAuto):

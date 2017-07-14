@@ -1,10 +1,8 @@
-import math
 from . import swervemodule
-
 from networktables import NetworkTable
 from networktables.util import ntproperty
-
 from robotpy_ext.common_drivers import navx
+import math
 
 
 class SwerveDrive:
@@ -28,7 +26,7 @@ class SwerveDrive:
         Called after injection.
         """
 
-        #Put all the modules into a dictionary
+        # Put all the modules into a dictionary
         self.modules = {
             'front_right': self.fr_module,
             'front_left': self.fl_module,

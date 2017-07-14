@@ -1,7 +1,6 @@
-import math
-
 from components import swervedrive, swervemodule
 from robotpy_ext.common_drivers import navx
+import math
 
 
 class FieldCentric:
@@ -51,13 +50,13 @@ class FieldCentric:
     def execute(self):
         theta = math.radians(360-self.navx.yaw)
 
-        fwdX = self._requested_vectors['fwd'] * math.cos(theta)
-        fwdY = (-self._requested_vectors['fwd']) * math.sin(theta)  # TODO: Verify and understand why fwd is negative.
+        fwdY = self._requested_vectors['fwd'] * math.cos(theta)
+        fwdX = (self._requested_vectors['fwd']) * math.sin(theta)  # I think it was because you were negative X in robot.py. X on joysticks is -1 .. 1 left to right
         strafeX = self._requested_vectors['strafe'] * math.cos(theta)
         strafeY = self._requested_vectors['strafe'] * math.sin(theta)
 
-        fwd = fwdX + strafeY
-        strafe = fwdY + strafeX
+        fwd = fwdY + strafeY
+        strafe = fwdX + strafeX
 
         if not self.set_raw_value:
             self.drive.set_fwd(fwd)

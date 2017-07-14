@@ -1,27 +1,20 @@
 #!/usr/bin/env python3
 
+from common import pressure_sensor, toggle_button
+from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
+from controllers.angle_controller import AngleController, MovingAngleController
+from controllers.auto_align import AutoAlign
+from controllers.field_centric import FieldCentric
+from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController
+from controllers.position_history import PositionHistory
+from controllers.position_tracker import PositionTracker, FCPositionTracker
+from magicbot.magic_tunable import tunable
+from networktables.networktable import NetworkTable
+from robotpy_ext.common_drivers import navx
+from robotpy_ext.control.button_debouncer import ButtonDebouncer
+import ctre
 import magicbot
 import wpilib
-import ctre
-
-from robotpy_ext.control.button_debouncer import ButtonDebouncer
-from networktables.util import ntproperty
-
-from robotpy_ext.common_drivers import navx
-
-from networktables.networktable import NetworkTable
-
-from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
-
-from common import pressure_sensor, scale, toggle_button
-
-from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController
-from controllers.angle_controller import AngleController, MovingAngleController
-from controllers.position_history import PositionHistory
-from controllers.field_centric import FieldCentric
-from controllers.position_tracker import PositionTracker, FCPositionTracker
-from controllers.auto_align import AutoAlign
-from magicbot.magic_tunable import tunable
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -72,9 +65,9 @@ class MyRobot(magicbot.MagicRobot):
 
         # Drive motors
         self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.85, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.92, inverted = True)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.92, inverted=True)
         self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.59)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted = True)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted=True)
 
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
@@ -161,14 +154,14 @@ class MyRobot(magicbot.MagicRobot):
         self.drive.squared_inputs = True
         self.drive.threshold_input_vectors = True
 
-    def move(self, x, y, rcw):
+    def move(self, y, x, rcw):
         if self.right_joystick.getRawButton(1):
-                rcw *= 0.75
+            rcw *= 0.75
 
         if not self.field_centric_drive or self.left_joystick.getRawButton(1):
-            self.drive.move(x, y, rcw)
+            self.drive.move(y, x, rcw)
         else:
-            self.field_centric.move(x, y)
+            self.field_centric.move(y, x)
             self.drive.set_rcw(rcw)
 
     def teleopPeriodic(self):
@@ -178,9 +171,9 @@ class MyRobot(magicbot.MagicRobot):
 
         # Drive system
         if not self.gamepad_mode or self.ds.isFMSAttached():
-            self.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+            self.move(self.left_joystick.getY() * -1, self.left_joystick.getX(), self.right_joystick.getX() * -1)
         else:
-            self.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0)*-1, self.left_joystick.getRawAxis(2)*-1)
+            self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) * -1)
 
         if self.field_centric_button.get():
             if not self.field_centric_drive:
@@ -214,13 +207,12 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.climb(-1)
         if self.secondary_joystick.getRawButton(6):
             self.climber.climb(-0.5)
-            
-            
+
         if self.secondary_joystick.getRawButton(5):
             self.light_controller.set(1)
         else:
             self.light_controller.set(0)
-            
+
         # Shooter
         if self.secondary_joystick.getRawButton(3):
             self.shooter.shoot()
@@ -230,8 +222,8 @@ class MyRobot(magicbot.MagicRobot):
         # Secondary driver gimble control
         if self.secondary_joystick.getRawButton(12):
             # scale.scale params: (input, input_min, input_max, output_min, output_max)
-            self.gimbal.yaw = scale.scale(self.secondary_joystick.getX()*-1, -1, 1, 0, 0.14)
-            self.gimbal.pitch = scale.scale(self.secondary_joystick.getY()*-1, -1, 1, 0.18, 0.72)
+            self.gimbal.yaw = self.secondary_joystick.getX() * -1
+            self.gimbal.pitch = self.secondary_joystick.getY() * -1
 
         # Auto align test
         if self.right_joystick.getRawButton(10):

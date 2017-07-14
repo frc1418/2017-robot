@@ -1,6 +1,7 @@
-import wpilib
-from networktables.networktable import NetworkTable
 from components import gimbal
+from networktables.networktable import NetworkTable
+import wpilib
+
 
 class GearPicker:
     # The piston that actuates to grab the gear
@@ -10,13 +11,11 @@ class GearPicker:
 
     gimbal = gimbal.Gimbal
 
-
     def setup(self):
         self.sd = NetworkTable.getTable('SmartDashboard')
 
         self._picker_state = 1
         self._pivot_state = 1
-
 
     def on_enable(self):
         pass
@@ -55,4 +54,3 @@ class GearPicker:
         self.update_sd()
         self.picker.set(self._picker_state)
         self.pivot.set(self._pivot_state)
-

@@ -1,9 +1,7 @@
-import cv2
-import numpy as np
-import math
-
 from networktables import NetworkTable
 from networktables.util import ntproperty
+import cv2
+import numpy as np
 
 
 class ImageProcessor:
@@ -63,7 +61,7 @@ class ImageProcessor:
             self.zeros = np.zeros((h, w, 1), dtype=np.bool)
             self.black = np.zeros((h, w, 3), dtype=np.uint8)
 
-            self.morphKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2), anchor=(0,0))
+            self.morphKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2), anchor=(0, 0))
 
         cv2.copyMakeBorder(img, 0, 0, 0, 0, cv2.BORDER_CONSTANT, value=self.RED, dst=self.out)
 
@@ -95,13 +93,13 @@ class ImageProcessor:
             if len(approx) > 3 and len(approx) < 15:
                 _, _, w, h = cv2.boundingRect(approx)
                 if h > self.min_height and w > self.min_width:
-                        hull = cv2.convexHull(cnt)
-                        approx2 = cv2.approxPolyDP(hull,0.01*cv2.arcLength(hull,True),True)
+                    hull = cv2.convexHull(cnt)
+                    approx2 = cv2.approxPolyDP(hull, 0.01*cv2.arcLength(hull, True), True)
 
-                        if self.draw_approx2:
-                            cv2.drawContours(self.out, [approx2], -1, self.GREEN, 2, lineType=8)
+                    if self.draw_approx2:
+                        cv2.drawContours(self.out, [approx2], -1, self.GREEN, 2, lineType=8)
 
-                        result.append(approx2)
+                    result.append(approx2)
         return result
 
     def get_contour_info(self, contour):

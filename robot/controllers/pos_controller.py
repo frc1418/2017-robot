@@ -1,10 +1,7 @@
-import math
-
-from magicbot import tunable
-
-from components import swervedrive
-from .base_pid_controller import BasePIDComponent
 from . import field_centric, position_tracker
+from .base_pid_controller import BasePIDComponent
+from components import swervedrive
+from magicbot import tunable
 
 
 class XPosController(BasePIDComponent):
@@ -33,7 +30,7 @@ class XPosController(BasePIDComponent):
 
     def is_at_location(self):
         return self.enabled and \
-                abs(self.get_position() - self.setpoint) < self.kToleranceFeet
+            abs(self.get_position() - self.setpoint) < self.kToleranceFeet
 
     def pidWrite(self, output):
         self.rate = -output
@@ -103,7 +100,6 @@ class FCXPosController(XPosController):
                 self.field_centric.set_strafe(0)
             else:
                 self.field_centric.set_strafe(self.rate)
-                #print(self.rate)
 
 
 class FCYPosController(YPosController):

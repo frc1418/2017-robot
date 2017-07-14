@@ -1,17 +1,10 @@
-from magicbot.state_machine import state, timed_state
-
 from .base_auto import VictisAuto
-
 from components import swervedrive, gearpicker, shooter
-
-from controllers.pos_controller import XPosController, YPosController
 from controllers.angle_controller import AngleController, MovingAngleController
-from controllers.position_history import PositionHistory
+from controllers.pos_controller import XPosController, YPosController
 from controllers.position_tracker import PositionTracker
-
-import wpilib
-from networktables import NetworkTable
 from magicbot.magic_tunable import tunable
+from magicbot.state_machine import state, timed_state
 
 
 class RightSideGearPlace(VictisAuto):

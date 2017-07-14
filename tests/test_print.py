@@ -1,9 +1,11 @@
-import ast
 from collections import deque
-import sys
+import ast
 import pytest
+import sys
+
 
 class FuncCallVisitor(ast.NodeVisitor):
+
     def __init__(self):
         self._name = deque()
 

@@ -1,9 +1,7 @@
-import math
-
 from components import swervemodule
-from robotpy_ext.common_drivers import navx
-
 from magicbot.magic_tunable import tunable
+from robotpy_ext.common_drivers import navx
+import math
 
 
 class PositionTracker:
@@ -20,34 +18,34 @@ class PositionTracker:
         self.enabled = False
 
         self._position = {
-                'y': 0,
-                'x': 0,
-                'rcw': 0
+            'y': 0,
+            'x': 0,
+            'rcw': 0
         }
 
         self._zeros = {
-                'front_left': 0,
-                'rear_right': 0,
-                'rear_left': 0,
-                'front_right': 0
+            'front_left': 0,
+            'rear_right': 0,
+            'rear_left': 0,
+            'front_right': 0
         }
 
         self.modules = {
-                'front_right': self.fr_module,
-                'front_left': self.fl_module,
-                'rear_left': self.rl_module,
-                'rear_right': self.rr_module
+            'front_right': self.fr_module,
+            'front_left': self.fl_module,
+            'rear_left': self.rl_module,
+            'rear_right': self.rr_module
         }
 
         self.module_torque_angle = {
-                'front_right': (math.pi / 4),
-                'front_left': -(math.pi / 4),
-                'rear_left': (math.pi / 4),
-                'rear_right': -(math.pi / 4)
+            'front_right': (math.pi / 4),
+            'front_left': -(math.pi / 4),
+            'rear_left': (math.pi / 4),
+            'rear_right': -(math.pi / 4)
         }
 
-        self.width = (22/12)/2
-        self.length = (18.5/12)/2
+        self.width = (22 / 12) / 2
+        self.length = (18.5 / 12) / 2
 
     def get_diff(self, value, old_zero):
         diff = value - old_zero
@@ -69,7 +67,7 @@ class PositionTracker:
 
         return math.sin(theta) * dist
 
-    def enable(self, zero_position = True):
+    def enable(self, zero_position=True):
         if not self.fl_module.has_drive_encoder or not self.rr_module.has_drive_encoder:
             if not self.rl_module.has_drive_encoder or not self.fr_module.has_drive_encoder:
                 raise 'Not enough drive encoders to predict position'
@@ -132,9 +130,9 @@ class PositionTracker:
 
                 encoders += 1
 
-        self._position['x'] += x * (1/encoders)
-        self._position['y'] += y * (1/encoders)
-        self._position['rcw'] += rcw * (1/encoders)
+        self._position['x'] += x * (1 / encoders)
+        self._position['y'] += y * (1 / encoders)
+        self._position['rcw'] += rcw * (1 / encoders)
 
     def execute(self):
         if self.enabled:

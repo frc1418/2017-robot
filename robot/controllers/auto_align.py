@@ -1,14 +1,10 @@
-import hal
-import wpilib
-
-from magicbot import state, timed_state, StateMachine, tunable
+from components.swervedrive import SwerveDrive
+from controllers.angle_controller import AngleController
+from controllers.pos_controller import XPosController, YPosController
+from controllers.position_history import PositionHistory
+from magicbot import state, StateMachine, tunable
 from networktables import NetworkTable
 from networktables.util import ntproperty
-
-from components.swervedrive import SwerveDrive
-from controllers.pos_controller import XPosController, YPosController
-from controllers.angle_controller import AngleController
-from controllers.position_history import PositionHistory
 
 
 class AutoAlign(StateMachine):
@@ -26,7 +22,7 @@ class AutoAlign(StateMachine):
     ideal_angle = tunable(-1.804)
 
     def __init__(self):
-        target = None
+        _ = None
 
         nt = NetworkTable.getTable('/camera')
         nt.addTableListener(self._on_target, True, 'target')
@@ -43,11 +39,11 @@ class AutoAlign(StateMachine):
         if target is not None and len(target) > 0:
             target = target[:]
 
-            angle, skew, capture_ts = target
+            angle, _, capture_ts = target
             history = self.pos_history.get_position(capture_ts)
 
             if history is not None:
-                r_angle, r_x, r_y, r_time = history
+                r_angle, _, _, _ = history
 
                 self.aimed_at_angle = r_angle + angle - self.ideal_angle
 

@@ -1,10 +1,9 @@
 from .base_auto import VictisAuto
-
 from components import swervedrive, gearpicker, shooter
-from controllers import angle_controller, pos_controller, position_history, position_tracker
-
-from magicbot.state_machine import timed_state, state, AutonomousStateMachine
+from controllers import angle_controller, pos_controller, position_tracker
 from magicbot.magic_tunable import tunable
+from magicbot.state_machine import timed_state, state
+
 
 class MiddleGearPlace(VictisAuto):
     """
@@ -37,8 +36,8 @@ class MiddleGearPlace(VictisAuto):
     # Warning: this is a field centric mode all positions are relative to starting position
     m_out_y = tunable(6.5, subtable='middle')
     m_out_x = tunable(0, subtable='middle')
-    
-    m_back_y = tunable(3, subtable='middle') # The cord that the robot backs off to before strafeing
+
+    m_back_y = tunable(3, subtable='middle')  # The cord that the robot backs off to before strafeing
 
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
@@ -212,7 +211,7 @@ class SideGearPlace(VictisAuto):
         self.fc_y_ctrl.move_to(self.s_out_y)
         self.fc_x_ctrl.move_to(self.s_out_x)
 
-        if self.fc_tracker.get_y() > self.s_out_y/2 and False:
+        if self.fc_tracker.get_y() > self.s_out_y / 2 and False:
             self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
         else:
             self.moving_angle_ctrl.align_to(0)
@@ -258,7 +257,7 @@ class SideGearPlace(VictisAuto):
             self.tracker.reset()
             self.gear_picker._picker_state = 1
             self.gear_picker.pivot_down()
-            
+
         self.y_ctrl.move_to(-self.s_to_peg_distance)
         self.moving_angle_ctrl.align_to(self.s_out_angle * self.s_direction)
 

@@ -1,11 +1,9 @@
-import hal
-import wpilib
-import time
-import threading
-
-from controllers.angle_controller import AngleController
-from components import swervedrive
 from collections import deque
+from controllers.angle_controller import AngleController
+import hal
+import threading
+import time
+import wpilib
 
 
 class PositionHistory:
