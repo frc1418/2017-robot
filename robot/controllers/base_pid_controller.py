@@ -77,8 +77,8 @@ class BasePIDComponent:
             output = err * self.kP + self.kI * self.err + self.kD * (err - self._last_err)
             output = min(self.MAX_RAW_OUTPUT, max(output, self.MIN_RAW_OUTPUT))
 
-            scaled_output = (((output - self.MIN_RAW_OUTPUT) * (self._abs_max - self._abs_min)) / (self.MAX_RAW_OUTPUT - self.MIN_RAW_OUTPUT)) + self.MIN_ABS_OUTPUT
-            math.copysign(scaled_output, output)
+            scaled_output = ((abs(output) - self.MIN_ABS_OUTPUT) / (self.MAX_ABS_OUTPUT - self.MIN_ABS_OUTPUT) * (self._abs_max - self._abs_min)) + self._abs_min
+            output = math.copysign(scaled_output, output)
 
             self._last_output = output
             self._last_err = err

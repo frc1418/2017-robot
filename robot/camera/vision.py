@@ -8,7 +8,7 @@ from image_processor import ImageProcessor
 from networktables import NetworkTable
 from networktables.util import ntproperty
 import cscore as cs
-import numpy as np
+importpy as np
 
 
 def main():

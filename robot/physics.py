@@ -1,5 +1,8 @@
 from networktables.util import ntproperty
+import logging
 import math
+
+logger = logging.getLogger('pyfrc.physics')
 
 
 class PhysicsEngine:
@@ -44,10 +47,7 @@ class PhysicsEngine:
             hal_data['analog_in'][2]['avg_voltage'] = self.rl_rotate_encoder
             hal_data['analog_in'][1]['avg_voltage'] = self.fr_rotate_encoder
             hal_data['analog_in'][3]['avg_voltage'] = self.fl_rotate_encoder
-        except Exception:
-            pass
 
-        try:
             # RR Motor
             hal_data['CAN'][30]['enc_position'] += hal_data['CAN'][30]['value'] / 1023 * tm_diff * 300000
             # RL Motor
@@ -64,8 +64,8 @@ class PhysicsEngine:
 
             vx, vy, vw = four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, self.lr_degrees, self.rr_degrees, self.lf_degrees, self.rf_degrees, x_wheelbase=3, y_wheelbase=3.6, speed=9)
             self.controller.vector_drive(vx, vy, vw, tm_diff)
-        except Exception:
-            pass
+        except KeyError as e:
+            logger.error(e)
 
 
 def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angle, rr_angle, lf_angle, rf_angle, x_wheelbase=2, y_wheelbase=2, speed=5):

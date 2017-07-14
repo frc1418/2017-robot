@@ -51,7 +51,7 @@ class FieldCentric:
         theta = math.radians(360-self.navx.yaw)
 
         fwdY = self._requested_vectors['fwd'] * math.cos(theta)
-        fwdX = (self._requested_vectors['fwd']) * math.sin(theta)  # I think it was because you were negative X in robot.py. X on joysticks is -1 .. 1 left to right
+        fwdX = -self._requested_vectors['fwd'] * math.sin(theta)  # It's because at +90 degrees, forward is in the negative x direction
         strafeX = self._requested_vectors['strafe'] * math.cos(theta)
         strafeY = self._requested_vectors['strafe'] * math.sin(theta)
 

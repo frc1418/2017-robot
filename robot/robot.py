@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from common import pressure_sensor, toggle_button
+from common import scale
 from components import shooter, gearpicker, swervemodule, swervedrive, climber, gimbal
 from controllers.angle_controller import AngleController, MovingAngleController
 from controllers.auto_align import AutoAlign
@@ -222,8 +223,8 @@ class MyRobot(magicbot.MagicRobot):
         # Secondary driver gimble control
         if self.secondary_joystick.getRawButton(12):
             # scale.scale params: (input, input_min, input_max, output_min, output_max)
-            self.gimbal.yaw = self.secondary_joystick.getX() * -1
-            self.gimbal.pitch = self.secondary_joystick.getY() * -1
+            self.gimbal.yaw = scale.scale(self.secondary_joystick.getX()*-1, -1, 1, 0, 0.14)
+            self.gimbal.pitch = scale.scale(self.secondary_joystick.getY()*-1, -1, 1, 0.18, 0.72)
 
         # Auto align test
         if self.right_joystick.getRawButton(10):
