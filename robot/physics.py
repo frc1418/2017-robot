@@ -110,7 +110,7 @@ def four_motor_swerve_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, lr_angl
     Vy = (math.cos(lr_rad) * lr) + (math.cos(rr_rad) * rr) + (math.cos(lf_rad) * lf) + (math.cos(rf_rad) * rf)
 
     # To make left negative
-    Vx *= -1
+    #Vx *= -1
 
     # Adjusts the angle corresponding to a diameter that is perpendicular to the radius (add or subtract 45deg)
     lr_rad = (lr_rad + (math.pi / 4)) % (2 * math.pi)

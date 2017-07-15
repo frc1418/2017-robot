@@ -48,7 +48,7 @@ class FieldCentric:
         self._requested_vectors['strafe'] = strafe
 
     def execute(self):
-        theta = math.radians(360-self.navx.yaw)
+        theta = math.radians(self.navx.yaw)
 
         fwdY = self._requested_vectors['fwd'] * math.cos(theta)
         fwdX = -self._requested_vectors['fwd'] * math.sin(theta)  # It's because at +90 degrees, forward is in the negative x direction
