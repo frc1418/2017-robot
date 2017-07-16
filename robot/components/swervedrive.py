@@ -220,23 +220,23 @@ class SwerveDrive:
 
         ratio = math.hypot(self.length, self.width)
         # Velocities per quadrant
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
-        frontX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
-        rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
+        A = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
+        B = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
+        C = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
+        D = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-        fr_speed = math.hypot(rightY, frontX)
-        fr_angle = math.degrees(math.atan2(frontX, rightY))
+        fr_speed = math.hypot(B, C)
+        fr_angle = math.degrees(math.atan2(B, C))
 
-        fl_speed = math.hypot(leftY, frontX)
-        fl_angle = math.degrees(math.atan2(frontX, leftY))
+        fl_speed = math.hypot(B, D)
+        fl_angle = math.degrees(math.atan2(B, D))
 
-        rl_speed = math.hypot(leftY, rearX)
-        rl_angle = math.degrees(math.atan2(rearX, leftY))
+        rl_speed = math.hypot(A, D)
+        rl_angle = math.degrees(math.atan2(A, D))
 
-        rr_speed = math.hypot(rightY, rearX)
-        rr_angle = math.degrees(math.atan2(rearX, rightY))
+        rr_speed = math.hypot(A, C)
+        rr_angle = math.degrees(math.atan2(A, C))
 
         # Assigns the speeds and angles in dictionaries
         self._requested_speeds['front_right'] = fr_speed
