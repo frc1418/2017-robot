@@ -100,7 +100,7 @@ class AngleController(BasePIDComponent):
         """
         Computes the error between the setpoint and pis_input
         
-        :returns A value in degrees of error. (360 to -360)
+        :returns: A value in degrees of error. (360 to -360)
         """
         
         error = pid_input - setpoint

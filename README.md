@@ -14,11 +14,13 @@ This code will be used to control FRC Team 1418's robot during the 2017 challeng
 	* Defensive "wheel locking" stance
 * Autonomous mode
 	* Score on any side of the tower (consistently at worlds)
-	* Strucure allows for both field centric and robot centric drive controls.
+	* Structure allows for both field centric and robot centric drive controls.
 
 ## Note
 
-**This swerve drive system is far from ideal. This code is written to field one robot and one robot only. It is not meant to be portable. There tidy few strange things that arise due to our hardware implementation of swervedrive. 3/4 through build season I started to notice this but by that point things just needed to work. I told my team many times that if I were to rewrite swerve drive it would look very different than the system here.**
+
+**This swerve drive system is far from ideal. This code is written to field one robot and one robot only. It is not meant to be portable. There are a few strange things that arise due to our hardware implementation of swervedrive. 3/4 through build season I started to notice this but by that point things just needed to work. I told my team many times that if I were to rewrite swerve drive it would look very different than the system here.**
+
 
 **TLDR: This system is designed for the irregularities of ONE robot and should not be seen as an over-arching example.**
 

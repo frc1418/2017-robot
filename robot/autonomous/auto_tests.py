@@ -4,7 +4,7 @@ diagnose issues with the robot's autonomous functions.
 Variables in this file can be changed liberally as needed.
 
 These autonomous modes should not be used during
-competition unless you know what your doing. ;) 
+competition unless you know what you are doing. ;) 
 '''
 
 from magicbot.state_machine import state, timed_state

@@ -8,6 +8,6 @@ def scale(input, input_min, input_max, output_min, output_max):
     :param output_min: The minimum of the output range
     :param output_max: The maximum of the output range
     
-    :returns An the input value scaled to the output range.
+    :returns: The input value scaled to the output range.
     """
     return ((input - input_min) / (input_max - input_min) * (output_max - output_min)) + output_min

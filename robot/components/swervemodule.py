@@ -72,13 +72,13 @@ class SwerveModule:
 
     def get_voltage(self):
         """
-        :returns the voltage position after the zero.
+        :returns: the voltage position after the zero.
         """
         return self.encoder.getAverageVoltage() - self.encoder_zero
 
     def get_drive_encoder_tick(self):
         """
-        :returns the positional value of the drive encoder
+        :returns: the positional value of the drive encoder
         """
         if not self.has_drive_encoder:
             return False
@@ -87,7 +87,7 @@ class SwerveModule:
 
     def get_drive_encoder_distance(self):
         """
-        :returns distance the wheel has rotated in feet.
+        :returns: distance the wheel has rotated in feet.
         """
         if not self.has_drive_encoder:
             return False
@@ -167,7 +167,7 @@ class SwerveModule:
 
     def is_aligned(self):
         """
-        :returns True if wheel is aligned to set point (False if not)
+        :returns: True if wheel is aligned to set point (False if not)
         """
         if abs(self._pid_controller.getError()) < 0.1:
             return True
