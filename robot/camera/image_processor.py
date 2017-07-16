@@ -1,7 +1,7 @@
 from networktables import NetworkTable
 from networktables.util import ntproperty
 import cv2
-importy as np
+import numpy as np
 
 
 class ImageProcessor:
