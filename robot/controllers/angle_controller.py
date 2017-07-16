@@ -79,7 +79,7 @@ class AngleController(BasePIDComponent):
         """
         :param setpoint: Setpoint value to check alignment against
         
-        :returns: True if aligned False if not
+        :return: True if aligned False if not
         """
         angle = self.get_angle()
 
@@ -100,7 +100,7 @@ class AngleController(BasePIDComponent):
         """
         Computes the error between the setpoint and pis_input
         
-        :returns: A value in degrees of error. (360 to -360)
+        :return: A value in degrees of error. (360 to -360)
         """
         
         error = pid_input - setpoint
