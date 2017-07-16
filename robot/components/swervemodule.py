@@ -33,6 +33,7 @@ class SwerveModule:
             :param inverted: boolean to invert the wheel rotation
 
             :param allow_reverse: If true allows wheels to spin backwards instead of rotating
+            :param has_drive_encoder: If true allows the module to track wheel position
 
         """
 
@@ -70,21 +71,33 @@ class SwerveModule:
         self._pid_controller.setPID(p, i, d)
 
     def get_voltage(self):
+        """
+        :returns the voltage position after the zero.
+        """
         return self.encoder.getAverageVoltage() - self.encoder_zero
 
     def get_drive_encoder_tick(self):
+        """
+        :returns the positional value of the drive encoder
+        """
         if not self.has_drive_encoder:
             return False
 
         return self.driveMotor.getPosition()
 
     def get_drive_encoder_distance(self):
+        """
+        :returns distance the wheel has rotated in feet.
+        """
         if not self.has_drive_encoder:
             return False
 
         return ((self.driveMotor.getPosition()) * WHEEL_CIRCUMFERENCE) / WHEEL_TICKS_PER_REV
 
     def flush(self):
+        """
+        Flushes the modules requested speed and voltage
+        """
         self._requested_voltage = self.encoder.getVoltage()
         self._requested_speed = 0
 
@@ -153,6 +166,9 @@ class SwerveModule:
         self.encoder_zero = self.encoder.getVoltage()
 
     def is_aligned(self):
+        """
+        :returns True if wheel is aligned to set point (False if not)
+        """
         if abs(self._pid_controller.getError()) < 0.1:
             return True
         return False
@@ -168,6 +184,9 @@ class SwerveModule:
     def move(self, speed, deg):
         """
         Set the requested speed and rotation of passed.
+        
+        :param speed: requested speed of wheel from -1 to 1
+        :param deg: requested angle of wheel from 0 to 359 (Will wrap if over or under)
         """
         deg %= 360  # Prevent values past 360
 
@@ -182,6 +201,9 @@ class SwerveModule:
         self._set_deg(deg)
 
     def debug(self):
+        """
+        Prints debugging information about the module to the log.
+        """
         print(self.sd_prefix, '; requested_speed: ', self._requested_speed, ' requested_voltage: ', self._requested_voltage)
 
     def execute(self):

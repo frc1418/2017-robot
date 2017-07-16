@@ -48,6 +48,8 @@ class AngleController(BasePIDComponent):
     def align_to(self, angle):
         """
         Move the robot and turns it to a specified absolute direction.
+        
+        :param angle: Angle value from 0 to 359
         """
         self.setpoint = angle
 
@@ -74,6 +76,11 @@ class AngleController(BasePIDComponent):
         return abs(error) < self.kToleranceDegrees
 
     def is_aligned_to(self, setpoint):
+        """
+        :param setpoint: Setpoint value to check alignment against
+        
+        :returns: True if aligned False if not
+        """
         angle = self.get_angle()
 
         # compensate for wraparound (code from PIDController)
@@ -90,8 +97,15 @@ class AngleController(BasePIDComponent):
         self.navx.reset()
 
     def compute_error(self, setpoint, pid_input):
+        """
+        Computes the error between the setpoint and pis_input
+        
+        :returns A value in degrees of error. (360 to -360)
+        """
+        
         error = pid_input - setpoint
-        if abs(error) > 180.0:
+        
+        if abs(error) > 180.0: # Used to find the closest path to the setpoint
             if error > 0:
                 error = error - 360.0
             else:
@@ -112,6 +126,10 @@ class AngleController(BasePIDComponent):
 
 
 class MovingAngleController(AngleController):
+    """
+    This class is a hacky way of changing the PID vraiables when the robot is moving. (Less friction)
+    """
+    
     kP = tunable(0.002)
     kI = tunable(0.0)
     kD = tunable(0.0)

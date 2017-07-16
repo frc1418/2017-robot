@@ -8,7 +8,21 @@ This code will be used to control FRC Team 1418's robot during the 2017 challeng
 
 ## Robot code features
 
-* Exists
+* Full pyfrc integration for testing & robot simulation
+* Omni-directional Swerve Drive System
+	* Field Centric control 
+	* Defensive "wheel locking" stance
+* Autonomous mode
+	* Score on any side of the tower (consistently at worlds)
+	* Strucure allows for both field centric and robot centric drive controls.
+
+## Note
+
+**This swerve drive system is far from ideal. There tidy few strange things that arise due to our hardware implementation of swervedrive. 3/4 through build season I started to notice this but by that point things just needed to work. I told my team many times that if I were to rewrite swerve drive it would look very different than the system here. 
+
+TLDR: This system is designed for the irregularities of ONE robot and should not be seen as an over-arching example.
+
+- Carter Fendley**
 
 ## Deploying onto the robot
 

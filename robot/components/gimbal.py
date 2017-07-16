@@ -5,6 +5,10 @@ from networktables.util import ntproperty
 
 
 class Gimbal:
+    """
+    This class allows for the camera Gimble to be set through NetworkTables
+    """
+    
     # Yaw = left/right, pitch = up/down
     gimbal_yaw = wpilib.Servo
     gimbal_pitch = wpilib.Servo

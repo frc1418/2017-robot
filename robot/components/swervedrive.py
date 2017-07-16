@@ -1,3 +1,17 @@
+"""
+NOTE: This swerve drive system is far from ideal. There tidy few
+strange things that arise due to our hardware implementation of
+swervedrive. 3/4 through build season I started to notice this
+but by that point things just needed to work. I told my team many
+times that if I were to rewrite swerve drive it would look very 
+different than the system here. 
+
+TLDR: This system is designed for the irregularities of ONE robot
+and should not be seen as an over-arching example.
+
+- Carter Fendley
+"""
+
 import math
 from . import swervemodule
 
@@ -8,6 +22,12 @@ from robotpy_ext.common_drivers import navx
 
 
 class SwerveDrive:
+    """
+    This class is the heart of the swerve drive system. Changes in this
+    class should be made with EXTERME care. Many different parts of
+    robot code use the functions with in this class.
+    """
+    
     fl_module = swervemodule.SwerveModule
     fr_module = swervemodule.SwerveModule
     rl_module = swervemodule.SwerveModule
@@ -66,6 +86,7 @@ class SwerveDrive:
 
         self.predict_position = False
 
+        # Variables that allow enabling and disabling of features in code
         self.allow_reverse = False
         self.squared_inputs = True
         self.snap_rotation = False
@@ -119,6 +140,9 @@ class SwerveDrive:
         return data
 
     def flush(self):
+        """
+        This method should be called to reset all requested values of the drive system.
+        """
         self._requested_vectors = {
             'fwd': 0,
             'strafe': 0,
@@ -143,15 +167,35 @@ class SwerveDrive:
             module.flush()
 
     def set_raw_fwd(self, fwd):
+        """
+        Sets the raw fwd value to prevent it from being passed through any filters
+        
+        :param fwd: A value from -1 to 1
+        """
         self._requested_vectors['fwd'] = fwd
 
     def set_raw_strafe(self, strafe):
+        """
+        Sets the raw strafe value to prevent it from being passed through any filters
+        
+        :param strafe: A value from -1 to 1
+        """
         self._requested_vectors['strafe'] = strafe
 
     def set_raw_rcw(self, rcw):
+        """
+        Sets the raw rcw value to prevent it from being passed through any filters
+        
+        :param rcw: A value from -1 to 1
+        """
         self._requested_vectors['rcw'] = rcw
 
     def set_fwd(self, fwd):
+        """
+        Individually sets the fwd value. (passed through filters)
+        
+        :param fwd: A value from -1 to 1
+        """
         if self.squared_inputs:
             fwd = self.square_input(fwd)
 
@@ -160,6 +204,11 @@ class SwerveDrive:
         self._requested_vectors['fwd'] = fwd
 
     def set_strafe(self, strafe):
+        """
+        Individually sets the strafe value. (passed through filters)
+        
+        :param strafe: A value from -1 to 1
+        """
         if self.squared_inputs:
             strafe = self.square_input(strafe)
 
@@ -168,6 +217,11 @@ class SwerveDrive:
         self._requested_vectors['strafe'] = strafe
 
     def set_rcw(self, rcw):
+        """
+        Individually sets the rcw value. (passed through filters)
+        
+        :param rcw: A value from -1 to 1
+        """
         if self.squared_inputs:
             rcw = self.square_input(rcw)
 
@@ -178,6 +232,12 @@ class SwerveDrive:
     def move(self, fwd, strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
+        
+        Positive fwd value = Forward robot movement
+        Negative fwd value = Backward robot movement
+        Positive strafe value = Left robot movement
+        Negative strafe value = Right robot movement
+        
         :param fwd: the requested movement in the Y direction 2D plane
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
@@ -259,6 +319,9 @@ class SwerveDrive:
         self._requested_vectors['rcw'] = 0.0
 
     def debug(self, debug_modules=False):
+        """
+        Prints debugging information to log
+        """
         if self.predict_position:
             print('Position: ', self._predicted_position, '\n')
 
