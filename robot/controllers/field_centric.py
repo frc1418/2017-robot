@@ -5,6 +5,14 @@ from robotpy_ext.common_drivers import navx
 
 
 class FieldCentric:
+    """
+    This controls the Swerve Drive system with field centric control.
+    
+    This functionality was separated from the main drive system to allow
+    for immediate and easy swapping between field centric and robot centric
+    control.
+    """
+    
     drive = swervedrive.SwerveDrive
 
     fl_module = swervemodule.SwerveModule

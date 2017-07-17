@@ -1,3 +1,12 @@
+'''
+This file contains a number of tests that were used to
+diagnose issues with the robot's autonomous functions.
+Variables in this file can be changed liberally as needed.
+
+These autonomous modes should not be used during
+competition unless you know what you are doing. ;) 
+'''
+
 from magicbot.state_machine import state, timed_state
 from components import swervedrive
 from controllers.pos_controller import XPosController, YPosController, FCXPosController, FCYPosController

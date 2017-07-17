@@ -2,6 +2,9 @@ from wpilib import AnalogInput
 
 
 class REVAnalogPressureSensor():
+    """
+    This class was written to read a REV Pressure Sensor.
+    """
 
     VOLTAGE_IN = 3.2
 

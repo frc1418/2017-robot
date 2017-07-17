@@ -2,6 +2,10 @@ import wpilib
 from networktables.networktable import NetworkTable
 
 class Climber:
+    """
+    This class operates the climber on the robot.
+    """
+    
     climb_motor1 = wpilib.spark.Spark
     climb_motor2 = wpilib.spark.Spark
 
@@ -12,6 +16,11 @@ class Climber:
         self.nt = NetworkTable.getTable('SmartDashboard')
 
     def climb(self, speed):
+        """
+        Sets the motor speed of each climbing motor
+        
+        :param speed: The requested speed from -1 to 1
+        """
         self._motor1_speed = speed
         self._motor2_speed = speed
 
