@@ -100,10 +100,9 @@ class SwerveModule:
         :param voltage: a voltage value between 0 and 5
         """
         deg = (voltage/5)*360
-        deg = deg
 
         if deg < 0:
-            deg = 360+deg
+            deg += 360
 
         return deg
 
@@ -114,8 +113,7 @@ class SwerveModule:
 
         :param voltage: a voltage value between 0 and 5
         """
-        rad = (voltage/5)*2*math.pi
-        return rad
+        return (voltage/5)*2*math.pi
 
     @staticmethod
     def voltage_to_tick(voltage):
@@ -124,7 +122,7 @@ class SwerveModule:
 
         :param voltage: a voltage value between 0 and 5
         """
-        return (voltage/5)*4050
+        return (voltage/5)*MAX_TICK
 
     @staticmethod
     def degree_to_voltage(degree):
@@ -140,9 +138,9 @@ class SwerveModule:
         """
         Convert a given tick to voltage.
 
-        :param tick: a tick value between 0 and 4050
+        :param tick: a tick value between 0 and MAX_TICK
         """
-        return (tick/4050)*5
+        return (tick/MAX_TICK)*5
 
     def zero_encoder(self):
         """
@@ -177,8 +175,7 @@ class SwerveModule:
             if abs(deg - self.voltage_to_degrees(self.get_voltage())) > 90:
                 speed *= -1
                 deg += 180
-
-                deg = deg % 360
+                deg %= 360
 
         self._requested_speed = speed
         self._set_deg(deg)

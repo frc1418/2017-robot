@@ -369,8 +369,8 @@ class SwerveDrive:
 
         if self.debugging:
             for key in self._requested_angles:
-                self.sd.putNumber('drive/drive/%s angle' % key, self._requested_angles[key])
-                self.sd.putNumber('drive/drive/%s speed' % key, self._requested_speeds[key])
+                self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
+                self.sd.putNumber('drive/drive/%s_speed' % key, self._requested_speeds[key])
 
         for key in self.modules:
             self.modules[key].update_smartdash()
