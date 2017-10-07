@@ -178,7 +178,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Drive system
         if not self.gamepad_mode or self.ds.isFMSAttached():
-            self.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+            self.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX())
         else:
             self.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2)*-1)
 
