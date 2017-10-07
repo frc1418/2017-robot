@@ -1,0 +1,3 @@
+robotpy-ctre==2017.0.3
+wpilib==2017.1.2
+pyfrc==2017.1.5

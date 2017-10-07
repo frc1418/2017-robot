@@ -3,8 +3,8 @@ NOTE: This swerve drive system is far from ideal. There tidy few
 strange things that arise due to our hardware implementation of
 swervedrive. 3/4 through build season I started to notice this
 but by that point things just needed to work. I told my team many
-times that if I were to rewrite swerve drive it would look very 
-different than the system here. 
+times that if I were to rewrite swerve drive it would look very
+different than the system here.
 
 TLDR: This system is designed for the irregularities of ONE robot
 and should not be seen as an over-arching example.
@@ -27,7 +27,7 @@ class SwerveDrive:
     class should be made with EXTERME care. Many different parts of
     robot code use the functions with in this class.
     """
-    
+
     fl_module = swervemodule.SwerveModule
     fr_module = swervemodule.SwerveModule
     rl_module = swervemodule.SwerveModule
@@ -48,7 +48,7 @@ class SwerveDrive:
         Called after injection.
         """
 
-        #Put all the modules into a dictionary
+        # Put all the modules into a dictionary
         self.modules = {
             'front_right': self.fr_module,
             'front_left': self.fl_module,
@@ -169,7 +169,7 @@ class SwerveDrive:
     def set_raw_fwd(self, fwd):
         """
         Sets the raw fwd value to prevent it from being passed through any filters
-        
+
         :param fwd: A value from -1 to 1
         """
         self._requested_vectors['fwd'] = fwd
@@ -177,7 +177,7 @@ class SwerveDrive:
     def set_raw_strafe(self, strafe):
         """
         Sets the raw strafe value to prevent it from being passed through any filters
-        
+
         :param strafe: A value from -1 to 1
         """
         self._requested_vectors['strafe'] = strafe
@@ -185,7 +185,7 @@ class SwerveDrive:
     def set_raw_rcw(self, rcw):
         """
         Sets the raw rcw value to prevent it from being passed through any filters
-        
+
         :param rcw: A value from -1 to 1
         """
         self._requested_vectors['rcw'] = rcw
@@ -193,7 +193,7 @@ class SwerveDrive:
     def set_fwd(self, fwd):
         """
         Individually sets the fwd value. (passed through filters)
-        
+
         :param fwd: A value from -1 to 1
         """
         if self.squared_inputs:
@@ -206,7 +206,7 @@ class SwerveDrive:
     def set_strafe(self, strafe):
         """
         Individually sets the strafe value. (passed through filters)
-        
+
         :param strafe: A value from -1 to 1
         """
         if self.squared_inputs:
@@ -219,7 +219,7 @@ class SwerveDrive:
     def set_rcw(self, rcw):
         """
         Individually sets the rcw value. (passed through filters)
-        
+
         :param rcw: A value from -1 to 1
         """
         if self.squared_inputs:
@@ -232,12 +232,12 @@ class SwerveDrive:
     def move(self, fwd, strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
-        
+
         Positive fwd value = Forward robot movement
         Negative fwd value = Backward robot movement
         Positive strafe value = Left robot movement
         Negative strafe value = Right robot movement
-        
+
         :param fwd: the requested movement in the Y direction 2D plane
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
@@ -282,23 +282,23 @@ class SwerveDrive:
 
         ratio = math.hypot(self.length, self.width)
         # Velocities per quadrant
+        rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
+        frontX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
         leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
         rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
-        frontX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
-        rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-        fr_speed = math.hypot(rightY, frontX)
-        fr_angle = math.degrees(math.atan2(frontX, rightY))
+        fr_speed = math.hypot(frontX, leftY)
+        fr_angle = math.degrees(math.atan2(frontX, leftY))
 
-        fl_speed = math.hypot(leftY, frontX)
-        fl_angle = math.degrees(math.atan2(frontX, leftY))
+        fl_speed = math.hypot(frontX, rightY)
+        fl_angle = math.degrees(math.atan2(frontX, rightY))
 
-        rl_speed = math.hypot(leftY, rearX)
-        rl_angle = math.degrees(math.atan2(rearX, leftY))
+        rl_speed = math.hypot(rearX, rightY)
+        rl_angle = math.degrees(math.atan2(rearX, rightY))
 
-        rr_speed = math.hypot(rightY, rearX)
-        rr_angle = math.degrees(math.atan2(rearX, rightY))
+        rr_speed = math.hypot(rearX, leftY)
+        rr_angle = math.degrees(math.atan2(rearX, leftY))
 
         # Assigns the speeds and angles in dictionaries
         self._requested_speeds['front_right'] = fr_speed
@@ -369,8 +369,8 @@ class SwerveDrive:
 
         if self.debugging:
             for key in self._requested_angles:
-                self.sd.putNumber('drive/drive/%s angle' % key, self._requested_angles[key])
-                self.sd.putNumber('drive/drive/%s speed' % key, self._requested_speeds[key])
+                self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
+                self.sd.putNumber('drive/drive/%s_speed' % key, self._requested_speeds[key])
 
         for key in self.modules:
             self.modules[key].update_smartdash()

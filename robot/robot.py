@@ -71,10 +71,10 @@ class MyRobot(magicbot.MagicRobot):
         self.secondary_trigger = ButtonDebouncer(self.secondary_joystick, 1)
 
         # Drive motors
-        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), SDPrefix='rr_module', zero=1.85, has_drive_encoder=True)
-        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), SDPrefix='rl_module', zero=3.92, inverted = True)
-        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), SDPrefix='fr_module', zero=4.59)
-        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), SDPrefix='fl_module', zero=2.44, has_drive_encoder=True, inverted = True)
+        self.fr_module = swervemodule.SwerveModule(ctre.CANTalon(30), wpilib.VictorSP(3), wpilib.AnalogInput(0), sd_prefix='rr_module', zero=1.85, has_drive_encoder=True)
+        self.fl_module = swervemodule.SwerveModule(ctre.CANTalon(20), wpilib.VictorSP(1), wpilib.AnalogInput(2), sd_prefix='rl_module', zero=3.92, inverted=True)
+        self.rr_module = swervemodule.SwerveModule(ctre.CANTalon(10), wpilib.VictorSP(2), wpilib.AnalogInput(1), sd_prefix='fr_module', zero=4.59)
+        self.rl_module = swervemodule.SwerveModule(ctre.CANTalon(5), wpilib.VictorSP(0), wpilib.AnalogInput(3), sd_prefix='fl_module', zero=2.44, has_drive_encoder=True, inverted=True)
 
         # Drive control
         self.field_centric_button = ButtonDebouncer(self.left_joystick, 6)
@@ -178,9 +178,9 @@ class MyRobot(magicbot.MagicRobot):
 
         # Drive system
         if not self.gamepad_mode or self.ds.isFMSAttached():
-            self.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX()*-1)
+            self.move(self.left_joystick.getY()*-1, self.left_joystick.getX()*-1, self.right_joystick.getX())
         else:
-            self.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0)*-1, self.left_joystick.getRawAxis(2)*-1)
+            self.move(self.left_joystick.getRawAxis(1)*-1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2)*-1)
 
         if self.field_centric_button.get():
             if not self.field_centric_drive:
@@ -214,13 +214,12 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.climb(-1)
         if self.secondary_joystick.getRawButton(6):
             self.climber.climb(-0.5)
-            
-            
+
         if self.secondary_joystick.getRawButton(5):
             self.light_controller.set(1)
         else:
             self.light_controller.set(0)
-            
+
         # Shooter
         if self.secondary_joystick.getRawButton(3):
             self.shooter.shoot()
