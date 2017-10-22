@@ -13,7 +13,7 @@ class MiddleGearPlace(VictisAuto):
     """
     MODE_NAME = 'Middle Gear Place'
     DEFAULT = False
-    DISABLED = True # Important to prevent this class from being run by itself
+    DISABLED = True  # Important to prevent this class from being run by itself
 
     # Injection
     drive = swervedrive.SwerveDrive
@@ -39,7 +39,7 @@ class MiddleGearPlace(VictisAuto):
     m_out_y = tunable(6.5, subtable='middle')
     m_out_x = tunable(0, subtable='middle')
 
-    m_back_y = tunable(3, subtable='middle') # The cord that the robot backs off to before strafeing
+    m_back_y = tunable(3, subtable='middle')  # The cord that the robot backs off to before strafeing
 
     # Shooting position
     m_tower_y = tunable(3, subtable='middle')
@@ -76,7 +76,6 @@ class MiddleGearPlace(VictisAuto):
     def middle_try_place(self):
         self.fc_x_ctrl.move_to(self.m_out_x)
         self.fc_y_ctrl.move_to(self.m_out_y)
-        self.drive.set_raw_rcw(0.4)
 
         if self.fc_y_ctrl.is_at_location():
             self.next_state('middle_drive_back')
@@ -152,7 +151,7 @@ class SideGearPlace(VictisAuto):
     """
     MODE_NAME = 'Side Gear Place'
     DEFAULT = False
-    DISABLED = True # Important to prevent this class from being run by itself
+    DISABLED = True  # Important to prevent this class from being run by itself
 
     # Injection
     drive = swervedrive.SwerveDrive
