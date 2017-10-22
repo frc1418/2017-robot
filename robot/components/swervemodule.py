@@ -13,7 +13,7 @@ WHEEL_TICKS_PER_REV = 55000
 
 class SwerveModule:
 
-    def __init__(self, drive_motor, rotate_motor, encoder, sd_prefix='SwerveModule', inverted=False, zero=0.0, allow_reverse=True, has_drive_encoder=False):
+    def __init__(self, drive_motor, rotate_motor, encoder, sd_prefix='SwerveModule', inverted=False, zero=0.0, allow_reverse=False, has_drive_encoder=False):
         """
         Swerve drive module was written for a swerve drive train that uses absolute encoders for tracking wheel rotation.
 
