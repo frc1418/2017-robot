@@ -25,7 +25,7 @@ class SwerveDrive:
     """
     This class is the heart of the swerve drive system. Changes in this
     class should be made with EXTERME care. Many different parts of
-    robot code use the functions with in this class.
+    robot code use the functions within this class.
     """
 
     fl_module = swervemodule.SwerveModule

@@ -201,7 +201,7 @@ class MiddleGearPlace(VictisAuto):
     @timed_state(duration=1, next_state='try_release')
     def rcw_with_gear(self):
         self.y_ctrl.move_to(self.out_distance)
-        self.drive.set_raw_rcw(0.4)
+        #self.drive.set_raw_rcw(0.4)
 
         if self.y_ctrl.is_at_location():
             self.drive.set_raw_rcw(0.0)
